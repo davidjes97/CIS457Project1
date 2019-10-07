@@ -21,22 +21,23 @@ class FTPClient {
         sentence = inFromUser.readLine();
         StringTokenizer tokens = new StringTokenizer(sentence);
 
-
+        //When the command connect is entered it will attempt a connection to the server and then allow for more commands
         if (sentence.startsWith("connect")) {
             String serverName = tokens.nextToken(); // pass the connect command
             serverName = tokens.nextToken();
             port1 = Integer.parseInt(tokens.nextToken());
             System.out.println("You are connected to " + serverName);
 
-            try{
+            //Attempts to connect to the server
+            try {
                 Socket ControlSocket = new Socket(serverName, port1);
                 clientgo = true;
-            }catch (exception e){
+            } catch (exception e) {//If the server does not exist an error is returned
                 clientgo = false;
                 System.out.println(e);
             }
 
-
+            //Continous loop that stops only when a user requests to quit
             while (isOpen && clientgo) {
 
                 DataOutputStream outToServer = new DataOutputStream(ControlSocket.getOutputStream());
@@ -45,6 +46,11 @@ class FTPClient {
 
                 sentence = inFromUser.readLine();
 
+                /*
+                When this command is sent to the server, the server returns a list of the
+                files in the current directory on which it is executing. The client should get the
+                list and display it on the screen.
+                 */
                 if (sentence.equals("list:")) {
 
                     port = port + 2;
@@ -65,7 +71,12 @@ class FTPClient {
                     dataSocket.close();
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
 
-                } else if (sentence.startsWith("retr: ")) {
+                }
+                /*
+                RETR <filename>: This command allows a client to get a file specified by its
+                filename from the server.
+                 */
+                else if (sentence.startsWith("retr: ")) {
 
                     port = port + 2;
                     outToServer.writeBytes(port + " " + sentence + " " + '\n');
@@ -85,8 +96,11 @@ class FTPClient {
                     dataSocket.close();
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
                 }
-
-                 else if (sentence.startsWith("stor:")){
+                /*
+                STOR <filename>: This command allows a client to send a file specified by its
+                filename to the server.
+                 */
+                else if (sentence.startsWith("stor: ")) {
                     port = port + 2;
                     outToServer.writeBytes(port + " " + sentence + " " + '\n');
 
@@ -105,8 +119,13 @@ class FTPClient {
                     dataSocket.close();
                     System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
                 }
-
-                } else if (sentence.equals("quit:")){
+                 /*
+                 QUIT: This command allows a client to terminate the control connection. On
+                 receiving this command, the client should send it to the server and terminate
+                 the connection. When the ftp_server receives the quit command it should
+                 close its end of the connection.
+                  */
+                else if (sentence.equals("quit:")) {
 
                     port = port + 2;
                     outToServer.writeBytes(sentence);
