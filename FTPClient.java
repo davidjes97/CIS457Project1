@@ -5,9 +5,12 @@ import java.text.*;
 import java.lang.*;
 import javax.swing.*;
 
-class FTPClient {
+class FTPClient { 
+    //  private static int port = 4203;
+    // private static InetAddress = host;
 
     public static void main(String argv[]) throws Exception {
+        int port = 4203;
         String sentence;
         String modifiedSentence;
         boolean isOpen = true;

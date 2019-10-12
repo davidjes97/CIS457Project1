@@ -1,10 +1,11 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-.................
-        .................
+..................................
 
+class ftpServer {
 
+        public static void main(String argv[]) throws Exception{
         String fromClient;
         String clientCommand;
         byte[]data;
@@ -12,7 +13,7 @@ import java.util.*;
 
         ServerSocket welcomeSocket=new ServerSocket(12000);
         String frstln;
-
+ 
         while(true)
         {
         Socket connectionSocket=welcomeSocket.accept();
@@ -45,4 +46,5 @@ import java.util.*;
         ..............................
         ..............................
         }
-    
+}
+}
