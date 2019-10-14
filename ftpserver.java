@@ -44,6 +44,14 @@ class ftpserver {
         // ..............................
         // ..............................
       }
+      if (clientCommand.equals("stor:")) {
+        // ..............................
+        // ..............................
+      }
+      if (clientCommand.equals("quit")) {
+        System.out.println(connectionSocket.getInetAddress() + " disconnected");
+        connectionSocket.close();
+      }
     }
   }
 }

@@ -28,11 +28,12 @@ class FTPClient {
 	        int port1 = Integer.parseInt(tokens.nextToken());
             System.out.println("You are connected to " + serverName);
         
-	        Socket ControlSocket= new Socket(serverName, port1);
-        
+            Socket ControlSocket= new Socket(serverName, port1);
+            
+
 	        while(isOpen && clientgo)
             {      
-	      
+                System.out.println("\nWhat would you like to do next: \n list: || retr: file.txt || stor: file.txt || quit ");
                 DataOutputStream outToServer = new DataOutputStream(ControlSocket.getOutputStream()); 
 	            DataInputStream inFromServer = new DataInputStream(new BufferedInputStream (ControlSocket.getInputStream()));
           
@@ -56,13 +57,27 @@ class FTPClient {
                     }
 	                welcomeData.close();
 	                dataSocket.close();
-	                System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
                 }
                 else if(sentence.startsWith("retr: "))
                 {
                    // ....................................................
                 }
-                ControlSocket.close();
+                else if(sentence.startsWith("stor: "))
+                {
+                   // ....................................................
+                }
+                else if(sentence.startsWith("quit"))
+                {
+                    port = port + 2;
+                    outToServer.writeBytes (port + " " + sentence + " " + '\n');
+                    isOpen = false;
+                    System.out.println("Closing Connection, Goodbye!");
+                    ControlSocket.close();
+                }
+                else
+                {
+
+                }
             }
         }  
     }
