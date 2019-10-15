@@ -15,7 +15,7 @@ class FTPClient {
         boolean notEnd = true;
         String statusCode;
         boolean clientgo = true;
-
+        final File folder = new File("storage/");
 
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System. in));
         sentence = inFromUser.readLine();
@@ -59,11 +59,31 @@ class FTPClient {
                     inData.close();
                     welcomeData.close();
                     dataSocket.close();
-                    notEnd= true;
+                    notEnd = true;
                 } 
                 else if (sentence.startsWith("retr: "))
                 { 
-                    // ....................................................
+                    port = port + 2;
+                    outToServer.writeBytes(port + " " + sentence + " " + '\n');
+
+                    ServerSocket welcomeData = new ServerSocket(port);
+                    Socket dataSocket = welcomeData.accept();
+                    DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+                    int read = 0;
+                    byte[] buffer = new byte[4096];
+                    String str = sentence;
+                    String[] words = str.split(" ");
+                    System.out.println(words[1]);
+                    FileOutputStream fos = new FileOutputStream(words[1]);
+                    long fileSize = inData.readLong();
+                    long remaining = fileSize;
+
+                    while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int) remaining))) > 0){ 
+                        remaining -= (long) read;
+                        fos.write(buffer, 0, read);
+
+                    }
+
                 } 
                 else if (sentence.startsWith("stor: "))
                 { 

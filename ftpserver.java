@@ -12,6 +12,7 @@ class ftpserver {
     byte[] data;
     int port;
     boolean connectionIsLive = true;
+    final File folder = new File("file_folder/");
 
     ServerSocket welcomeSocket = new ServerSocket(12000);
     String frstln;
@@ -35,7 +36,6 @@ class ftpserver {
         //Setting stuff up
         Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
         DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-        final File folder = new File("file_folder/");
 
 
         // ArrayList<String> fileNames = new ArrayList<String>(); 
@@ -53,11 +53,35 @@ class ftpserver {
         System.out.println("Data Socket closed");
       }
 
-      
+      /*****************************************
+       * Retrieve method:  
+       * Takes in a file name and querries for it and sends it.
+       */
       if (clientCommand.equals("retr:")) {
-        // ..............................
-        // ..............................
+
+        long fileSize = 0;
+        String[] words = fromClient.split(" ");
+        File[] temp = folder.listFiles();        
+        for (int i=0; i < temp.length; ++i) {
+                if(temp[i].getName().equals(words[2])){
+                fileSize = temp[i].length();
+
+                }
+            }
+        Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
+        DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+        FileInputStream fis = new FileInputStream(folder + "/" + words[2]);
+        byte[] buffer = new byte[4096];
+        int read;
+        dataOutToClient.writeLong (fileSize);  
+        while((read = fis.read(buffer)) > 0) {
+          dataOutToClient.write(buffer, 0, read);
+        }
+
+        dataOutToClient.close();
+        dataSocket.close();
       }
+
       if (clientCommand.equals("stor:")) {
         // ..............................
         // ..............................
