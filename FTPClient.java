@@ -68,8 +68,8 @@ class FTPClient {
 
 				else if(sentence.startsWith("stor: ")){
 					// need to get a file (fileToSend)
-
-
+					File fileToSend = new File("/Users/josh.gorodinsky/hello.txt");
+					
 					// Create input stream
 					FileInputStream fis = new FileInputStream(fileToSend);
 					BufferedInputStream bis = new BufferedInputStream(fis);
