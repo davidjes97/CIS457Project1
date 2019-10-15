@@ -1,6 +1,3 @@
 
-.idea/CIS457Project1.iml
-.idea/misc.xml
-.idea/modules.xml
+*.class
 *.xml
-.vscode/settings.json
