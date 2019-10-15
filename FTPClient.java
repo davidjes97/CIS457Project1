@@ -35,7 +35,16 @@ class FTPClient {
                 DataInputStream inFromServer = new DataInputStream(new BufferedInputStream(ControlSocket.getInputStream()));
 
                 sentence = inFromUser.readLine();
-
+                /*******************************************************
+                *  _      _     _   
+                * | |    (_)   | |  
+                * | |     _ ___| |_ 
+                * | |    | / __| __|
+                * | |____| \__ \ |_ 
+                * |______|_|___/\__|
+                *  
+                * Lists all file names in the file folder.
+                ********************************************************/
                 if (sentence.equals("list:")) 
                 {
 
@@ -60,6 +69,16 @@ class FTPClient {
                     dataSocket.close();
                     notEnd = true;
                 } 
+                /*******************************************************
+                *   _____      _        _                
+                *  |  __ \    | |      (_)               
+                *  | |__) |___| |_ _ __ _  _____   _____ 
+                *  |  _  // _ \ __| '__| |/ _ \ \ / / _ \
+                *  | | \ \  __/ |_| |  | |  __/\ V /  __/
+                *  |_|  \_\___|\__|_|  |_|\___| \_/ \___|
+                *                             
+                * Takes in a file name and querries for it and sends it.
+                ********************************************************/
                 else if (sentence.startsWith("retr: "))
                 { 
                     port = port + 2;
@@ -76,16 +95,30 @@ class FTPClient {
                     long fileSize = inData.readLong();
                     long remaining = fileSize;
 
+                    System.out.println("Downloading File.......")
+
                     while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int) remaining))) > 0){ 
                         remaining -= (long) read;
                         fos.write(buffer, 0, read);
 
-                    }
+                    }     
+                    System.out.println("\nFile Successfully downloaded.")
                     welcomeData.close();
                     inData.close();
                     dataSocket.close();
 
                 } 
+                /*******************************************************
+                 *   _____ _                             
+                 *  / ____| |                            
+                 * | (___ | |_ ___  _ __ __ _  __ _  ___ 
+                 *  \___ \| __/ _ \| '__/ _` |/ _` |/ _ \
+                 *  ____) | || (_) | | | (_| | (_| |  __/
+                 * |_____/ \__\___/|_|  \__,_|\__, |\___|
+                 *                             __/ |     
+                 *                            |___/                        
+                 * Takes in a file delivery.
+                ********************************************************/
                 else if (sentence.startsWith("stor: "))
                 { 
                     port = port + 2;
@@ -105,7 +138,6 @@ class FTPClient {
                     for (int i=0; i < temp.length; ++i) {
                         if(temp[i].getName().equals(words[1])){
                         fileSize = temp[i].length();
-        
                         }
                     }
                     dataOutToClient.writeLong(fileSize); 
@@ -117,6 +149,16 @@ class FTPClient {
                     dataOutToClient.close();
                     dataSocket.close();
                 } 
+                /*******************************************************
+                *   ____        _ _   
+                *  / __ \      (_) |  
+                * | |  | |_   _ _| |_ 
+                * | |  | | | | | | __|
+                * | |__| | |_| | | |_ 
+                *  \___\_\\__,_|_|\__|
+                *                                                
+                * Is notified by the clien that the connection is being closed
+                ********************************************************/
                 else if (sentence.startsWith("quit")) 
                 {
                     port = port + 2;
@@ -125,7 +167,7 @@ class FTPClient {
                     System.out.println("Closing Connection, Goodbye!");
                     ControlSocket.close();
                 } else {
-
+                    System.out.println("Didn't quite recognize that command try one of thses!");
                 }
             }
         }

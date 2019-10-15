@@ -30,7 +30,18 @@ class ftpserver {
       frstln = tokens.nextToken();
       port = Integer.parseInt(frstln);
       clientCommand = tokens.nextToken();
+      System.out.println(connectionSocket.getInetAddress() + " connected");
 
+      /*******************************************************
+      *  _      _     _   
+      * | |    (_)   | |  
+      * | |     _ ___| |_ 
+      * | |    | / __| __|
+      * | |____| \__ \ |_ 
+      * |______|_|___/\__|
+      *  
+      * Lists all file names in the file folder.
+      ********************************************************/
       if (clientCommand.equals("list:")) {
 
         //Setting stuff up
@@ -83,7 +94,7 @@ class ftpserver {
         while((read = fis.read(buffer)) > 0) {
           dataOutToClient.write(buffer, 0, read);
         }
-
+        System.out.println("\nFile " + words[2] + " Sent.")
         fis.close();
         dataOutToClient.close();
         dataSocket.close();
@@ -110,14 +121,25 @@ class ftpserver {
         long fileSize = inData.readLong();
         long remaining = fileSize;
 
+
         while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int) remaining))) > 0){ 
             remaining -= (long) read;
             fos.write(buffer, 0, read);
-
         }
+        System.out.println("\nFile " + words[2] + " Successfully downloaded.")
         inData.close();
         dataSocket.close();
       }
+      /*******************************************************
+      *   ____        _ _   
+      *  / __ \      (_) |  
+      * | |  | |_   _ _| |_ 
+      * | |  | | | | | | __|
+      * | |__| | |_| | | |_ 
+      *  \___\_\\__,_|_|\__|
+      *                                                
+      * Is notified by the clien that the connection is being closed
+      ********************************************************/
       if (clientCommand.equals("quit")) {
         System.out.println(connectionSocket.getInetAddress() + " disconnected");
         connectionSocket.close();
