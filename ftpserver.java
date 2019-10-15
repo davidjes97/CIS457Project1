@@ -94,7 +94,7 @@ class ftpserver {
         while((read = fis.read(buffer)) > 0) {
           dataOutToClient.write(buffer, 0, read);
         }
-        System.out.println("\nFile " + words[2] + " Sent.")
+        System.out.println("\nFile " + words[2] + " Sent.");
         fis.close();
         dataOutToClient.close();
         dataSocket.close();
@@ -126,7 +126,7 @@ class ftpserver {
             remaining -= (long) read;
             fos.write(buffer, 0, read);
         }
-        System.out.println("\nFile " + words[2] + " Successfully downloaded.")
+        System.out.println("\nFile " + words[2] + " Successfully downloaded.");
         inData.close();
         dataSocket.close();
       }

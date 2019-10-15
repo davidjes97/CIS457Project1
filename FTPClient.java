@@ -95,14 +95,14 @@ class FTPClient {
                     long fileSize = inData.readLong();
                     long remaining = fileSize;
 
-                    System.out.println("Downloading File.......")
+                    System.out.println("Downloading File.......");
 
                     while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int) remaining))) > 0){ 
                         remaining -= (long) read;
                         fos.write(buffer, 0, read);
 
                     }     
-                    System.out.println("\nFile Successfully downloaded.")
+                    System.out.println("\nFile Successfully downloaded.");
                     welcomeData.close();
                     inData.close();
                     dataSocket.close();
