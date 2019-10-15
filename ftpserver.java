@@ -53,10 +53,16 @@ class ftpserver {
         System.out.println("Data Socket closed");
       }
 
-      /*****************************************
-       * Retrieve method:  
-       * Takes in a file name and querries for it and sends it.
-       */
+      /*******************************************************
+      *  _____      _        _                
+      *  |  __ \    | |      (_)               
+      *  | |__) |___| |_ _ __ _  _____   _____ 
+      *  |  _  // _ \ __| '__| |/ _ \ \ / / _ \
+      *  | | \ \  __/ |_| |  | |  __/\ V /  __/
+      *  |_|  \_\___|\__|_|  |_|\___| \_/ \___|
+      *                             
+      * Takes in a file name and querries for it and sends it.
+      ********************************************************/
       if (clientCommand.equals("retr:")) {
 
         long fileSize = 0;
@@ -78,13 +84,39 @@ class ftpserver {
           dataOutToClient.write(buffer, 0, read);
         }
 
+        fis.close();
         dataOutToClient.close();
         dataSocket.close();
       }
-
+      /*******************************************************
+      *   _____ _                             
+      *  / ____| |                            
+      * | (___ | |_ ___  _ __ __ _  __ _  ___ 
+      *  \___ \| __/ _ \| '__/ _` |/ _` |/ _ \
+      *  ____) | || (_) | | | (_| | (_| |  __/
+      * |_____/ \__\___/|_|  \__,_|\__, |\___|
+      *                             __/ |     
+      *                            |___/                        
+      * Takes in a file delivery.
+      ********************************************************/
       if (clientCommand.equals("stor:")) {
-        // ..............................
-        // ..............................
+        Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
+        DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+        int read = 0;
+        byte[] buffer = new byte[4096];
+        String str = fromClient;
+        String[] words = str.split(" ");
+        FileOutputStream fos = new FileOutputStream(folder + "/" + words[2]);
+        long fileSize = inData.readLong();
+        long remaining = fileSize;
+
+        while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int) remaining))) > 0){ 
+            remaining -= (long) read;
+            fos.write(buffer, 0, read);
+
+        }
+        inData.close();
+        dataSocket.close();
       }
       if (clientCommand.equals("quit")) {
         System.out.println(connectionSocket.getInetAddress() + " disconnected");

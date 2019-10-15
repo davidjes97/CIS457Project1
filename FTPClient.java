@@ -15,7 +15,6 @@ class FTPClient {
         boolean notEnd = true;
         String statusCode;
         boolean clientgo = true;
-        final File folder = new File("storage/");
 
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System. in));
         sentence = inFromUser.readLine();
@@ -73,7 +72,6 @@ class FTPClient {
                     byte[] buffer = new byte[4096];
                     String str = sentence;
                     String[] words = str.split(" ");
-                    System.out.println(words[1]);
                     FileOutputStream fos = new FileOutputStream(words[1]);
                     long fileSize = inData.readLong();
                     long remaining = fileSize;
@@ -83,11 +81,41 @@ class FTPClient {
                         fos.write(buffer, 0, read);
 
                     }
+                    welcomeData.close();
+                    inData.close();
+                    dataSocket.close();
 
                 } 
                 else if (sentence.startsWith("stor: "))
                 { 
-                    // ....................................................
+                    port = port + 2;
+                    outToServer.writeBytes(port + " " + sentence + " " + '\n');
+                    ServerSocket welcomeData = new ServerSocket(port);
+                    Socket dataSocket = welcomeData.accept();
+                    DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+
+                    File folder = new File("./");
+                    File[] temp = folder.listFiles();  
+                    String str = sentence;
+                    String[] words = str.split(" ");
+                    FileInputStream fis = new FileInputStream(words[1]);
+                    byte[] buffer = new byte[4096];
+                    long fileSize = 0;
+                    int read;        
+                    for (int i=0; i < temp.length; ++i) {
+                        if(temp[i].getName().equals(words[1])){
+                        fileSize = temp[i].length();
+        
+                        }
+                    }
+                    dataOutToClient.writeLong(fileSize); 
+
+                    while((read = fis.read(buffer)) > 0) {
+                        dataOutToClient.write(buffer, 0, read);
+                    }
+                    welcomeData.close();
+                    dataOutToClient.close();
+                    dataSocket.close();
                 } 
                 else if (sentence.startsWith("quit")) 
                 {
@@ -96,7 +124,9 @@ class FTPClient {
                     isOpen = false;
                     System.out.println("Closing Connection, Goodbye!");
                     ControlSocket.close();
-                } else {}
+                } else {
+
+                }
             }
         }
     }
