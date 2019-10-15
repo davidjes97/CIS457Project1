@@ -1,57 +1,44 @@
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.text.*;
-import java.lang.*;
-import javax.swing.*;
-
+import java.io. *;
+import java.net. *;
+import java.util. *;
+import java.text. *;
+import java.lang. *;
+import javax.swing. *;
 class FTPClient {
 
-    public static void main(String argv[]) throws Exception {
+    public static void main(String argv[])throws Exception {
         String sentence;
         String modifiedSentence;
         boolean isOpen = true;
         int number = 1;
+        int port = 2328;
         boolean notEnd = true;
         String statusCode;
         boolean clientgo = true;
+        final File folder = new File("storage/");
 
-
-        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System. in));
         sentence = inFromUser.readLine();
         StringTokenizer tokens = new StringTokenizer(sentence);
 
-        //When the command connect is entered it will attempt a connection to the server and then allow for more commands
+
         if (sentence.startsWith("connect")) {
             String serverName = tokens.nextToken(); // pass the connect command
             serverName = tokens.nextToken();
-            port1 = Integer.parseInt(tokens.nextToken());
+            int port1 = Integer.parseInt(tokens.nextToken());
             System.out.println("You are connected to " + serverName);
 
-            //Attempts to connect to the server
-            try {
-                Socket ControlSocket = new Socket(serverName, port1);
-                clientgo = true;
-            } catch (exception e) {//If the server does not exist an error is returned
-                clientgo = false;
-                System.out.println(e);
-            }
+            Socket ControlSocket = new Socket(serverName, port1);
 
-            //Continous loop that stops only when a user requests to quit
             while (isOpen && clientgo) {
-
+                System.out.println("\nWhat would you like to do next: \n list: || retr: file.txt || stor: file.txt || quit ");
                 DataOutputStream outToServer = new DataOutputStream(ControlSocket.getOutputStream());
-
                 DataInputStream inFromServer = new DataInputStream(new BufferedInputStream(ControlSocket.getInputStream()));
 
                 sentence = inFromUser.readLine();
 
-                /*
-                When this command is sent to the server, the server returns a list of the
-                files in the current directory on which it is executing. The client should get the
-                list and display it on the screen.
-                 */
-                if (sentence.equals("list:")) {
+                if (sentence.equals("list:")) 
+                {
 
                     port = port + 2;
                     outToServer.writeBytes(port + " " + sentence + " " + '\n');
@@ -60,80 +47,68 @@ class FTPClient {
                     Socket dataSocket = welcomeData.accept();
 
                     DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+
                     while (notEnd) {
                         modifiedSentence = inData.readUTF();
-               ........................................
-	       ........................................
+                        if (modifiedSentence.equals("EOF")) {
+                            notEnd = false;
+                        } else 
+                            System.out.print(modifiedSentence);
+                        
                     }
-
-
+                    inData.close();
                     welcomeData.close();
                     dataSocket.close();
-                    System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
-
-                }
-                /*
-                RETR <filename>: This command allows a client to get a file specified by its
-                filename from the server.
-                 */
-                else if (sentence.startsWith("retr: ")) {
-
+                    notEnd = true;
+                } 
+                else if (sentence.startsWith("retr: "))
+                { 
                     port = port + 2;
                     outToServer.writeBytes(port + " " + sentence + " " + '\n');
 
-                    ServerSocket welecomeData = new ServerSocket(port);
-                    Socket dataSocket = welecomeData.accept();
-
+                    ServerSocket welcomeData = new ServerSocket(port);
+                    Socket dataSocket = welcomeData.accept();
                     DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-                    while (notEnd) {
-                        modifiedSentence = inData.readUTF();
-               ........................................
-	       ........................................
+                    int read = 0;
+                    byte[] buffer = new byte[4096];
+                    String str = sentence;
+                    String[] words = str.split(" ");
+                    System.out.println(words[1]);
+                    FileOutputStream fos = new FileOutputStream(words[1]);
+                    long fileSize = inData.readLong();
+                    long remaining = fileSize;
+
+                    while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int) remaining))) > 0){ 
+                        remaining -= (long) read;
+                        fos.write(buffer, 0, read);
+
                     }
 
-
-                    welcomeData.close();
-                    dataSocket.close();
-                    System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
-                }
-                /*
-                STOR <filename>: This command allows a client to send a file specified by its
-                filename to the server.
-                 */
-                else if (sentence.startsWith("stor: ")) {
+                } 
+                else if (sentence.startsWith("stor: "))
+                { 
+                    // ....................................................
+                } 
+                else if (sentence.startsWith("quit")) 
+                {
                     port = port + 2;
                     outToServer.writeBytes(port + " " + sentence + " " + '\n');
-
-                    ServerSocket welecomeData = new ServerSocket(port);
-                    Socket dataSocket = welecomeData.accept();
-
-                    DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-                    while (notEnd) {
-                        modifiedSentence = inData.readUTF();
-               ........................................
-	       ........................................
-                    }
-
-
-                    welcomeData.close();
-                    dataSocket.close();
-                    System.out.println("\nWhat would you like to do next: \n retr: file.txt ||stor: file.txt  || close");
-                }
-                 /*
-                 QUIT: This command allows a client to terminate the control connection. On
-                 receiving this command, the client should send it to the server and terminate
-                 the connection. When the ftp_server receives the quit command it should
-                 close its end of the connection.
-                  */
-                else if (sentence.equals("quit:")) {
-
-                    port = port + 2;
-                    outToServer.writeBytes(sentence);
-
+                    isOpen = false;
+                    System.out.println("Closing Connection, Goodbye!");
                     ControlSocket.close();
-                    isOpen = false
-
-                } else {
-                    System.out.println("Error, incorrect command");
-                }
+                } else {}
             }
+        }
+    }
+    public static String parse_string(String myString) {
+        String str = myString.split(" ")[0];
+        str = str.replace("\\", "");
+        String[] arr = str.split("u");
+        String text = "";
+        for (int i = 1; i < arr.length; i ++) {
+            int hexVal = Integer.parseInt(arr[i], 16);
+            text += (char)hexVal;
+        }
+        return text;
+    }
+}
