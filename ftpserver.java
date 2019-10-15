@@ -30,16 +30,25 @@ class ftpserver {
 
       if (clientCommand.equals("list:")) {
 
+        //Setting stuff up
         Socket dataSocket = new Socket(connectionSocket.getInetAddress(), port);
         DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-        // ..........................
+        final File folder = new File("file_folder/");
+
+
+        ArrayList<String> fileNames = new ArrayList<String>(); 
+        File[] temp = folder.listFiles();
+        if(temp == null){
+        System.out.println("FIXME");
+        }
+        for (int i=0; i < temp.length; ++i) {
+                dataOutToClient.writeUTF (temp[i].getName() + "" + '\n');  
+        }
+        dataOutToClient.writeUTF("EOF");
 
         dataSocket.close();
         System.out.println("Data Socket closed");
       }
-
-      // ......................
-
       if (clientCommand.equals("retr:")) {
         // ..............................
         // ..............................
