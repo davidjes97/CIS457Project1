@@ -2,12 +2,33 @@ import java.io. *;
 import java.net. *;
 import java.util. *;
 import java.text. *;
-import java.lang. *;
 import javax.swing. *;
 class FTPClient {
+    private static String serverName;
+    private static int port1;
+
+    private static BufferedReader inFromUser;
+    private static StringTokenizer tokens;
+    private static String sentence;
+    private static Socket ControlSocket;
+
+    private static DataOutputStream outToServer;
 
     public static void main(String argv[])throws Exception {
-        String sentence;
+        inFromUser = new BufferedReader(new InputStreamReader(System. in));
+        sentence = inFromUser.readLine();
+        tokens = new StringTokenizer(sentence);
+
+        if (sentence.startsWith("connect")) {
+            serverName = tokens.nextToken();
+            serverName = tokens.nextToken();
+            port1 = Integer.parseInt(tokens.nextToken());
+            sendCommands();
+        }
+
+    }
+
+    private static void sendCommands() {
         String modifiedSentence;
         boolean isOpen = true;
         int number = 1;
@@ -15,27 +36,18 @@ class FTPClient {
         boolean notEnd = true;
         String statusCode;
         boolean clientgo = true;
+        System.out.println("You are connected to " + serverName);
 
-        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System. in));
-        sentence = inFromUser.readLine();
-        StringTokenizer tokens = new StringTokenizer(sentence);
-
-
-        if (sentence.startsWith("connect")) {
-            String serverName = tokens.nextToken(); // pass the connect command
-            serverName = tokens.nextToken();
-            int port1 = Integer.parseInt(tokens.nextToken());
-            System.out.println("You are connected to " + serverName);
-
-            Socket ControlSocket = new Socket(serverName, port1);
-
-            while (isOpen && clientgo) {
-                System.out.println("\nWhat would you like to do next: \n list: || retr: file.txt || stor: file.txt || quit ");
-                DataOutputStream outToServer = new DataOutputStream(ControlSocket.getOutputStream());
+        try{
+            ControlSocket = new Socket(serverName, port1);
+        
+        while (isOpen && clientgo) {
+            System.out.println("\nWhat would you like to do next: \n list: || retr: file.txt || stor: file.txt || quit ");
+           
+                outToServer = new DataOutputStream(ControlSocket.getOutputStream());
                 DataInputStream inFromServer = new DataInputStream(new BufferedInputStream(ControlSocket.getInputStream()));
-
-                sentence = inFromUser.readLine();
-                /*******************************************************
+            sentence = inFromUser.readLine();
+            /*******************************************************
                 *  _      _     _   
                 * | |    (_)   | |  
                 * | |     _ ___| |_ 
@@ -45,31 +57,33 @@ class FTPClient {
                 *  
                 * Lists all file names in the file folder.
                 ********************************************************/
-                if (sentence.equals("list:")) 
-                {
+            if (sentence.equals("list:")) {
 
-                    port = port + 2;
-                    outToServer.writeBytes(port + " " + sentence + " " + '\n');
+                port = port + 2;
+                
+                outToServer.writeBytes(port + " " + sentence + " " + '\n');
+                
 
-                    ServerSocket welcomeData = new ServerSocket(port);
-                    Socket dataSocket = welcomeData.accept();
+                ServerSocket welcomeData = new ServerSocket(port);
+                Socket dataSocket = welcomeData.accept();
 
-                    DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+                DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
 
-                    while (notEnd) {
-                        modifiedSentence = inData.readUTF();
-                        if (modifiedSentence.equals("EOF")) {
-                            notEnd = false;
-                        } else 
-                            System.out.print(modifiedSentence);
-                        
-                    }
-                    inData.close();
-                    welcomeData.close();
-                    dataSocket.close();
-                    notEnd = true;
-                } 
-                /*******************************************************
+                while (notEnd) {
+                    modifiedSentence = inData.readUTF();
+                    if (modifiedSentence.equals("EOF")) {
+                        notEnd = false;
+                    } else 
+                        System.out.print(modifiedSentence);
+                    
+
+                }
+                inData.close();
+                welcomeData.close();
+                dataSocket.close();
+                notEnd = true;
+            }
+            /*******************************************************
                 *   _____      _        _                
                 *  |  __ \    | |      (_)               
                 *  | |__) |___| |_ _ __ _  _____   _____ 
@@ -78,37 +92,36 @@ class FTPClient {
                 *  |_|  \_\___|\__|_|  |_|\___| \_/ \___|
                 *                             
                 * Takes in a file name and querries for it and sends it.
-                ********************************************************/
-                else if (sentence.startsWith("retr: "))
-                { 
-                    port = port + 2;
-                    outToServer.writeBytes(port + " " + sentence + " " + '\n');
+                ********************************************************/ 
+            else if (sentence.startsWith("retr: ")) {
+                port = port + 2;
+                outToServer.writeBytes(port + " " + sentence + " " + '\n');
 
-                    ServerSocket welcomeData = new ServerSocket(port);
-                    Socket dataSocket = welcomeData.accept();
-                    DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-                    int read = 0;
-                    byte[] buffer = new byte[4096];
-                    String str = sentence;
-                    String[] words = str.split(" ");
-                    FileOutputStream fos = new FileOutputStream(words[1]);
-                    long fileSize = inData.readLong();
-                    long remaining = fileSize;
+                ServerSocket welcomeData = new ServerSocket(port);
+                Socket dataSocket = welcomeData.accept();
+                DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+                int read = 0;
+                byte[] buffer = new byte[4096];
+                String str = sentence;
+                String[] words = str.split(" ");
+                FileOutputStream fos = new FileOutputStream(words[1]);
+                long fileSize = inData.readLong();
+                long remaining = fileSize;
 
-                    System.out.println("Downloading File.......")
+                System.out.println("Downloading File.......");
 
-                    while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int) remaining))) > 0){ 
-                        remaining -= (long) read;
-                        fos.write(buffer, 0, read);
+                while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int)remaining))) > 0) {
+                    remaining -= (long)read;
+                    fos.write(buffer, 0, read);
 
-                    }     
-                    System.out.println("\nFile Successfully downloaded.")
-                    welcomeData.close();
-                    inData.close();
-                    dataSocket.close();
+                }
+                System.out.println("\nFile Successfully downloaded.");
+                welcomeData.close();
+                inData.close();
+                dataSocket.close();
 
-                } 
-                /*******************************************************
+            }
+            /*******************************************************
                  *   _____ _                             
                  *  / ____| |                            
                  * | (___ | |_ ___  _ __ __ _  __ _  ___ 
@@ -118,38 +131,39 @@ class FTPClient {
                  *                             __/ |     
                  *                            |___/                        
                  * Takes in a file delivery.
-                ********************************************************/
-                else if (sentence.startsWith("stor: "))
-                { 
-                    port = port + 2;
-                    outToServer.writeBytes(port + " " + sentence + " " + '\n');
-                    ServerSocket welcomeData = new ServerSocket(port);
-                    Socket dataSocket = welcomeData.accept();
-                    DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+                ********************************************************/ 
+            else if (sentence.startsWith("stor: ")) {
+                port = port + 2;
+                outToServer.writeBytes(port + " " + sentence + " " + '\n');
+                ServerSocket welcomeData = new ServerSocket(port);
+                Socket dataSocket = welcomeData.accept();
+                DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
 
-                    File folder = new File("./");
-                    File[] temp = folder.listFiles();  
-                    String str = sentence;
-                    String[] words = str.split(" ");
-                    FileInputStream fis = new FileInputStream(words[1]);
-                    byte[] buffer = new byte[4096];
-                    long fileSize = 0;
-                    int read;        
-                    for (int i=0; i < temp.length; ++i) {
-                        if(temp[i].getName().equals(words[1])){
+                File folder = new File("./");
+                File[] temp = folder.listFiles();
+                String str = sentence;
+                String[] words = str.split(" ");
+                FileInputStream fis = new FileInputStream(words[1]);
+                byte[] buffer = new byte[4096];
+                long fileSize = 0;
+                int read;
+                for (int i = 0; i < temp.length; ++i) {
+                    if (temp[i].getName().equals(words[1])) {
                         fileSize = temp[i].length();
-                        }
                     }
-                    dataOutToClient.writeLong(fileSize); 
+                }
+                dataOutToClient.writeLong(fileSize);
 
-                    while((read = fis.read(buffer)) > 0) {
-                        dataOutToClient.write(buffer, 0, read);
-                    }
-                    welcomeData.close();
-                    dataOutToClient.close();
-                    dataSocket.close();
-                } 
-                /*******************************************************
+                while ((read = fis.read(buffer)) > 0) {
+                    dataOutToClient.write(buffer, 0, read);
+                }
+                welcomeData.close();
+
+                dataOutToClient.close();
+                dataSocket.close();
+                fis.close();
+            }
+            /*******************************************************
                 *   ____        _ _   
                 *  / __ \      (_) |  
                 * | |  | |_   _ _| |_ 
@@ -159,18 +173,21 @@ class FTPClient {
                 *                                                
                 * Is notified by the clien that the connection is being closed
                 ********************************************************/
-                else if (sentence.startsWith("quit")) 
-                {
-                    port = port + 2;
-                    outToServer.writeBytes(port + " " + sentence + " " + '\n');
-                    isOpen = false;
-                    System.out.println("Closing Connection, Goodbye!");
-                    ControlSocket.close();
-                } else {
-                    System.out.println("Didn't quite recognize that command try one of thses!");
-                }
+            else if (sentence.startsWith("quit")) {
+                port = port + 2;
+                outToServer.writeBytes(port + " " + sentence + " " + '\n');
+                isOpen = false;
+                System.out.println("Closing Connection, Goodbye!");
+                ControlSocket.close();
+            } else {
+                System.out.println("Didn't quite recognize that command try one of thses!");
             }
         }
+    }
+    catch(IOException ioEx){
+        System.out.println("\nHost ID not found");
+        System.exit(1);
+    }
     }
     public static String parse_string(String myString) {
         String str = myString.split(" ")[0];
@@ -184,3 +201,4 @@ class FTPClient {
         return text;
     }
 }
+
