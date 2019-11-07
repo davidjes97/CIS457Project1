@@ -62,7 +62,7 @@ class ClientHandler extends Thread {
                 clientCommand = tokens.nextToken();
                 System.out.println(connectionSocket.getInetAddress() + " connected");
 
-                /*******************************************************
+        /*******************************************************
         *  _      _     _   
         * | |    (_)   | |  
         * | |     _ ___| |_ 
