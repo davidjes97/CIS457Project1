@@ -37,11 +37,11 @@ public class hostGUI extends JFrame implements ActionListener {
 	private JLabel portNumberLBL;
 	/**Label for userName textbox*/
 	private JLabel userNameLBL;
-    /**Label for hostName textbox*/
-    private JLabel hostNameLBL;
-    /**Label for speed droplist*/
-    private JLabel speedLBL;
-    /**Used to connect to centralized server*/
+    	/**Label for hostName textbox*/
+    	private JLabel hostNameLBL;
+    	/**Label for speed droplist*/
+    	private JLabel speedLBL;
+    	/**Used to connect to centralized server*/
 	private JButton connectBut;
 	/**Allows the user to enter desired IP address*/
 	private JTextField hostIPTXT;
@@ -116,9 +116,9 @@ public class hostGUI extends JFrame implements ActionListener {
 		connectTitle = new JLabel("<html> <font color='blue'>CONNECTION</font></html>");
 		IPNameLBL = new JLabel("Server Hostname:");
 		portNumberLBL = new JLabel("Port:");
-        userNameLBL = new JLabel("Username:");
-        hostNameLBL = new JLabel("Hostname:");
-        speedLBL = new JLabel("Speed:");
+        	userNameLBL = new JLabel("Username:");
+        	hostNameLBL = new JLabel("Hostname:");
+        	speedLBL = new JLabel("Speed:");
 
 		/**Organizes components on the panel*/
 		connectTitle.setBounds(5,5, 100, 26);
