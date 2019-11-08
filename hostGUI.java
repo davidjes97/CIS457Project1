@@ -1,5 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.*;
+
 import javax.swing.*;
 /*****************************************************************
 * Host GUI supports the front end for three user functions:
@@ -35,11 +37,11 @@ public class hostGUI extends JFrame implements ActionListener {
 	private JLabel portNumberLBL;
 	/**Label for userName textbox*/
 	private JLabel userNameLBL;
-  	/**Label for hostName textbox*/
-  	private JLabel hostNameLBL;
-  	/**Label for speed droplist*/
-  	private JLabel speedLBL;
-  	/**Used to connect to centralized server*/
+    /**Label for hostName textbox*/
+    private JLabel hostNameLBL;
+    /**Label for speed droplist*/
+    private JLabel speedLBL;
+    /**Used to connect to centralized server*/
 	private JButton connectBut;
 	/**Allows the user to enter desired IP address*/
 	private JTextField hostIPTXT;
@@ -114,9 +116,9 @@ public class hostGUI extends JFrame implements ActionListener {
 		connectTitle = new JLabel("<html> <font color='blue'>CONNECTION</font></html>");
 		IPNameLBL = new JLabel("Server Hostname:");
 		portNumberLBL = new JLabel("Port:");
-        	userNameLBL = new JLabel("Username:");
-        	hostNameLBL = new JLabel("Hostname:");
-        	speedLBL = new JLabel("Speed:");
+        userNameLBL = new JLabel("Username:");
+        hostNameLBL = new JLabel("Hostname:");
+        speedLBL = new JLabel("Speed:");
 
 		/**Organizes components on the panel*/
 		connectTitle.setBounds(5,5, 100, 26);
@@ -228,22 +230,43 @@ public class hostGUI extends JFrame implements ActionListener {
 	 ************************************************/
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
 		if(e.getSource() == connectBut) {	
-            
+			String hostIP = hostIPTXT.getText();
+			int port = Integer.parseInt(portTXT.getText());
+			String userName = userNameTXT.getText();
+			String hostName = hostNameTXT.getText();
+			String speed = (String) speedList.getSelectedItem();	//might not work
+			commandArea.append(hostIP + " " + port + " connected.\n");		//this will need to be deleted, not how were actually supposed to do this
+																	//want to have centralized server display that this user connected
 		}
 		else if(e.getSource() == searchBut){
-
+			String keyword = keywordTXT.getText();
 		}
 		else if(e.getSource() == goBut){
-			dispose();
-			if(commandTXT.getText() == "quit")
+			/** used to get the command the user has entered*/
+			StringTokenizer tokenizer = new StringTokenizer(commandTXT.getText());
+			String command = tokenizer.nextToken();
+
+			if(command.equals("quit"))
 			{
+				dispose();
 				//call the quit function
 			}
-			else if(commandTXT.getText() == "retr")			//will need to change this, only look st first word of commandTXT
+			else if(command.equals("retr"))	
 			{
+				String filename = tokenizer.nextToken();
 				//call the retr function, look at remote host connected with that file
 				//probably have to iterate through array till specified filename is found
+			}
+			else if(command.equals("connect"))
+			{
+				String IPaddress = tokenizer.nextToken();					//IP address to connect with
+				int remotePort = Integer.parseInt(tokenizer.nextToken());	//portnumber user has entered to connect with
+			}
+			else
+			{
+				commandArea.append("\nInvalid command! \nValid commands are: 'connect IP Port' || 'retr filename.txt' || 'quit'");
 			}
 		}
 	}
