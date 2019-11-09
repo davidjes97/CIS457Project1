@@ -26,12 +26,12 @@ class centralServer {
     }
 }
 
-class ClientHandler extends Thread{
+class ClientServerHandler extends Thread{
 
     private Socket connectionSocket;
 
-    private boolean ruuning;
-    boolean welcomeMessage;
+    private boolean connectionIsLive;
+    protected boolean welcomeFlag;
     
     private DataInputStream dataFromClient;
     private DataOutputStream outToClient;
@@ -48,8 +48,8 @@ class ClientHandler extends Thread{
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
             inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
-            this.welcomeMessage = true;
-            this.running = true;
+            this.welcomeFlag = true;
+            this.connectionIsLive = true;
             System.out.println("Connection Established");
         } catch (IOException ioEx) {
             ioEx.printStackTrace();
@@ -57,10 +57,13 @@ class ClientHandler extends Thread{
     }
 
     public void run() {
+        String fromClient;
+        String clientCommand;
+        int port;
 
         try{
-            while(this.running){
-                if (welcomeMessage){
+            while(connectionIsLive){
+                if (welcomeFlag){
                     String userInfo = this.inFromClient.readLine();
                     getInitialRequest(userInfo);
                 } else {
@@ -83,16 +86,16 @@ class ClientHandler extends Thread{
         StringTokenizer tokens = new StringTokenizer(sentence);
 
         System.out.println("Keyword searched");
-        searchCommand(tokens.nextToken());
+        searchKeyword(tokens.nextToken());
     }
 
-    private void SearchKeyword(String keyword) throws Exception{
+    private void searchKeyword(String keyword) throws Exception{
         synchronized (fileList){
             synchronized (userList){
                 //String output = "";  Use an object for the output?
 
-                for (int i = 0; i < centralServer.fileList.size(); i++){
-                    FileElement fileEntry = (FileElement) centralServer.fileList.get(i);
+                for (int i = 0; i < ClientServerHandler.fileList.size(); i++){
+                    FileElement fileEntry = (FileElement) ClientServerHandler.fileList.get(i);
                     String description = fileEntry.getDescription();
                     if (description.contains(keyword)){
                         UserElement user = fileEntry.getUser();
@@ -100,7 +103,7 @@ class ClientHandler extends Thread{
                     }
                 }
                 System.out.println("Sending back: " + "output will go here");
-               // this.outToClient.writeBytes(output + "\n");
+               //this.outToClient.writeBytes(output + "\n");
             }
         }
     }

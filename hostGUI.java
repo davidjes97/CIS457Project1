@@ -94,6 +94,22 @@ public class hostGUI extends JFrame implements ActionListener {
 		setTitle("GV-NAPSTER Host");
 		getContentPane();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		/**ADDING IN BUTTON BINDING 
+		 * Helped by Uluk Biy on Stack Overflow
+		 * Link: https://stackoverflow.com/questions/23040531/how-to-disable-button-when-textfield-is-empty
+		 */
+		// BooleanBinding bb = new BooleanBinding() {
+		// 	{
+		// 		super.bind(keywordTXT.textProperty());
+		// 	}
+
+		// 	@Override
+		// 	protected boolean computeValue(){
+		// 		return (keywordTXT.getText().isEmpty());
+		// 	}
+		// };
+
 		
 		/**FOR THE CONNECTION SECTION */
 
@@ -116,9 +132,9 @@ public class hostGUI extends JFrame implements ActionListener {
 		connectTitle = new JLabel("<html> <font color='blue'>CONNECTION</font></html>");
 		IPNameLBL = new JLabel("Server Hostname:");
 		portNumberLBL = new JLabel("Port:");
-        	userNameLBL = new JLabel("Username:");
-        	hostNameLBL = new JLabel("Hostname:");
-        	speedLBL = new JLabel("Speed:");
+        userNameLBL = new JLabel("Username:");
+        hostNameLBL = new JLabel("Hostname:");
+        speedLBL = new JLabel("Speed:");
 
 		/**Organizes components on the panel*/
 		connectTitle.setBounds(5,5, 100, 26);
@@ -169,14 +185,19 @@ public class hostGUI extends JFrame implements ActionListener {
 		/**Initialize Variables */
 		keywordTXT = new JTextField("",10);
 		searchTitle = new JLabel("<html> <font color='blue'>SEARCH</font></html>");
-		keywordLBL = new JLabel("Server Hostname:");
+		keywordLBL = new JLabel("Keyword:");
 		searchBut = new JButton("Search");
 		searchBut.addActionListener(this);
+		//Adding boolean binding to keyword search button
+		// searchBut.disablePropert().bind(bb);
+
+		// VBox vBox = new VBox();
+		// vBox.getChildren().addAll(keyWordTXT, searchBut);
 
 		/**Set Location on Panel */
 		searchTitle.setBounds(5, 127, 100, 26);
 		keywordLBL.setBounds(10, 150, 160, 26);
-		keywordTXT.setBounds(120, 150, 250, 26);
+		keywordTXT.setBounds(80, 150, 250, 26);
 		searchBut.setBounds(390, 150, 150, 26);
 		scroll.setBounds(10, 190, 700, 200);
 
