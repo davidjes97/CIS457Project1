@@ -1,7 +1,10 @@
 import java.io. *;
 import java.net. *;
 import java.util. *;
+
 import javax.xml.parsers.*;
+
+import org.w3c.dom.*;
 
 class centralServer {
 
@@ -29,6 +32,7 @@ class centralServer {
 class ClientServerHandler extends Thread{
 
     private Socket connectionSocket;
+    private Socket dataSocket;
 
     private boolean connectionIsLive;
     protected boolean welcomeFlag;
@@ -92,18 +96,18 @@ class ClientServerHandler extends Thread{
     private void searchKeyword(String keyword) throws Exception{
         synchronized (fileList){
             synchronized (userList){
-                //String output = "";  Use an object for the output?
+                String output = "";
 
                 for (int i = 0; i < ClientServerHandler.fileList.size(); i++){
                     FileElement fileEntry = (FileElement) ClientServerHandler.fileList.get(i);
                     String description = fileEntry.getDescription();
                     if (description.contains(keyword)){
                         UserElement user = fileEntry.getUser();
-                        //output += user.getSpeed() + " " +  use an object for the output?
+                        output += user.getSpeed() + " " + user.getHostName() + " " + fileEntry.getFileName() + "\t";
                     }
                 }
                 System.out.println("Sending back: " + "output will go here");
-               //this.outToClient.writeBytes(output + "\n");
+                this.outToClient.writeBytes(output + "\n");
             }
         }
     }
@@ -123,14 +127,14 @@ class ClientServerHandler extends Thread{
         System.out.println("Adding the user");
         addUser(user);
 
-        this.dataFromClient = new DataInputStream(new BufferedInputStream(this.dataSocket.getInpuStream()));
+        this.dataFromClient = new DataInputStream(new BufferedInputStream(this.dataSocket.getInputStream()));
 
         System.out.println("User added");
 
         File file = getFile();
         ArrayList<FileElement> files = parseData(file, user);
         addContent(files);
-        this.welcomeMessage = false;
+        this.welcomeFlag = false;
         System.out.println("Initial connection completed");
         this.dataFromClient.close();
         this.dataSocket.close();
@@ -154,7 +158,7 @@ class ClientServerHandler extends Thread{
     }
 
     private ArrayList<FileElement> parseData(File file, UserElement user) throws Exception {
-        ArrayList<FileElement> dataList = new ArrayList();
+        ArrayList<FileElement> dataList = new ArrayList<FileElement>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(file);

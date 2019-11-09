@@ -1,2 +1,2 @@
-javac centralServer.java FileElement.java UserElement.java
+javac -Xlint:unchecked centralServer.java FileElement.java UserElement.java
 java centralServer

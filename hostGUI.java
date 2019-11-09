@@ -1,3 +1,5 @@
+import java.awt.EventQueue;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -37,11 +39,11 @@ public class hostGUI extends JFrame implements ActionListener {
 	private JLabel portNumberLBL;
 	/**Label for userName textbox*/
 	private JLabel userNameLBL;
-    	/**Label for hostName textbox*/
-    	private JLabel hostNameLBL;
-    	/**Label for speed droplist*/
-    	private JLabel speedLBL;
-    	/**Used to connect to centralized server*/
+    /**Label for hostName textbox*/
+    private JLabel hostNameLBL;
+    /**Label for speed droplist*/
+    private JLabel speedLBL;
+    /**Used to connect to centralized server*/
 	private JButton connectBut;
 	/**Allows the user to enter desired IP address*/
 	private JTextField hostIPTXT;
@@ -86,7 +88,21 @@ public class hostGUI extends JFrame implements ActionListener {
     * @param args Standard declaration for main
     **********************************************/
     public static void main(String args[]) {
-        hostGUI hgui = new hostGUI();
+		EventQueue.invokeLater(new Runnable(){
+			public void run(){
+				try{
+					hostGUI hgui = new hostGUI();
+					hgui.pack();
+					hgui.setVisible(true);
+					ftpserver server = new ftpserver();
+					FTPClient client = new FTPClient();
+					Thread thread = new Thread(server);
+					thread.start();
+				} catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		});
     }
 
 	/**Initializes each variable*/
