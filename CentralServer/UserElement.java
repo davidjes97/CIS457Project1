@@ -13,7 +13,7 @@ public class UserElement{
         return this.userName;
     }
     
-    public String getHostname(){
+    public String getHostName(){
         return this.hostName;
     }
 

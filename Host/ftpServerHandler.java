@@ -1,39 +1,11 @@
-import java.io. *;
-import java.net. *;
-import java.util. *;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.text.*;
+import java.lang.*;
+import javax.swing.*;
 
-public class ftpserver implements Runnable {
-
-    private static ServerSocket welcomeSocket;
-
-    public ftpserver() throws Exception {
-        try {
-            welcomeSocket = new ServerSocket(12000);
-
-        } catch (IOException ioEx) {
-            System.out.println("\nUnable to set up port!");
-            System.exit(1);
-        }
-
-        public void run(){
-            while (true) {
-                try{
-                    Socket connectionSocket = welcomeSocket.accept();
-
-                    System.out.println("\nNew client accepted.\n");
-                    ClientHandler handler = new ClientHandler(connectionSocket);
-
-                    handler.start();
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }
-            }   
-        }
-    }     
-}
-
-class ClientHandler implements Runnable extends Thread {
+class ftpServerHandler implements Runnable{
 
     private Socket dataSocket;
     private Socket controlSocket;
@@ -45,13 +17,13 @@ class ClientHandler implements Runnable extends Thread {
 
     private boolean hostIsRunning;
 
-    public ClientHandler(Socket connection) throws Exception{
-        this.connectionSocket = connection;
-        this.outToClient = new DatOutputStream(this.connectionSocket.getOutputStream());
-        this.inFromClient = new BufferedReader(new InputStreamReader(this.connectionSocket.getInputStream());
+    public ftpServerHandler(Socket connection) throws Exception{
+        this.controlSocket = connection;
+        this.outToClient = new DataOutputStream(this.controlSocket.getOutputStream());
+        this.inFromClient = new BufferedReader(new InputStreamReader(this.controlSocket.getInputStream()));
     }
 
-    public String run() {
+    public void run() {
         try{
             this.hostIsRunning = true;
             waitForRequest();
@@ -64,7 +36,7 @@ class ClientHandler implements Runnable extends Thread {
         while(this.hostIsRunning){
             String fromClient = null;
             fromClient = this.inFromClient.readLine();
-            processRequest(fromClient);
+            runCommand(fromClient);
         }
     }
 
@@ -73,7 +45,7 @@ class ClientHandler implements Runnable extends Thread {
         int port = Integer.parseInt(tokens.nextToken());
         String command = tokens.nextToken();
 
-        this.dataSocket = new Socket(this.connectionSocket.getInetAddress(), port);
+        this.dataSocket = new Socket(this.controlSocket.getInetAddress(), port);
 
         this.dataOutToClient = new DataOutputStream(this.dataSocket.getOutputStream());
 

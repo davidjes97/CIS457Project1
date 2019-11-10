@@ -2,36 +2,36 @@ import java.io. *;
 import java.net. *;
 import java.util. *;
 
-public class FTPClient {
+// public class FTPClient {
 
-    private static ServerSocket welcomeSocket;
+//     private static ServerSocket welcomeSocket;
 
-    public static void main(String argv[])throws Exception {
-        try {
-            welcomeSocket = new ServerSocket(12000);
+//     public static void main(String argv[])throws Exception {
+//         try {
+//             welcomeSocket = new ServerSocket(12000);
 
-        } catch (IOException ioEx) {
-            System.out.println("\nUnable to set up port!");
-            System.exit(1);
-        }
+//         } catch (IOException ioEx) {
+//             System.out.println("\nUnable to set up port!");
+//             System.exit(1);
+//         }
 
-        while (true) {
-            try{
-                Socket connectionSocket = welcomeSocket.accept();
+//         while (true) {
+//             try{
+//                 Socket connectionSocket = welcomeSocket.accept();
 
-                System.out.println("\nNew client accepted.\n");
-                ClientHandler handler = new ClientHandler(connectionSocket);
+//                 System.out.println("\nNew client accepted.\n");
+//                 ClientHandler handler = new ClientHandler(connectionSocket);
 
-                handler.start();
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
-}
+//                 handler.start();
+//             }
+//             catch(Exception e){
+//                 e.printStackTrace();
+//             }
+//         }
+//     }
+// }
 
-class ClientHandler extends Runnable {
+public class ClientHandler{
 
     private int controlPort;
 
@@ -53,7 +53,7 @@ class ClientHandler extends Runnable {
     public String runCommand(String sentence) throws Exception {
         String message = "";
         StringTokenizer token = new StringTokenizer(sentence);
-        String command = token.nextToekn();
+        String command = token.nextToken();
         command = command.toLowerCase();
 
         initializeConnection(sentence);
@@ -62,11 +62,11 @@ class ClientHandler extends Runnable {
         if(command.equals("retr:")){
             String fileName = token.nextToken();
             retrieveFile(fileName);
-            message = "Succesfully downloaded \"" fileName + "\".";
+            message = "Succesfully downloaded \"" + fileName + "\".";
         } else if (command.equals("quit:")){
             message= "Disconnected from server.";
         }
-        closeConnection();
+        closeAllConnections();
         return message;
     }
 
@@ -79,7 +79,7 @@ class ClientHandler extends Runnable {
         byte[] fileData = new byte[1024];
         int bytes = 0;
 
-        while((bytes = inData.read(fileData)) != -1){
+        while((bytes = dataIn.read(fileData)) != -1){
             retrievedFile.write(fileData, 0 ,bytes);
         }
         retrievedFile.close();
@@ -89,21 +89,21 @@ class ClientHandler extends Runnable {
         outToServer.writeBytes(port + " " + sentence + " " + "\n");
     }
 
-    private void setUpConnection(String sentence) throws Exception{
+    private void initializeConnection(String sentence) throws Exception{
 
         int connectionPort = getNewPort();
 
-        this.welcomeData = new ServerSocket(connectionPort);
+        this.welcomeSocket = new ServerSocket(connectionPort);
 
         welcomeMessage(connectionPort, sentence);
 
-        this.dataSocket = this.welcomeData.accept();
+        this.dataSocket = this.welcomeSocket.accept();
         this. dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
     }
 
     private void closeAllConnections() throws Exception{
         this.dataIn.close();
-        this.welcomeData.close();
+        this.welcomeSocket.close();
         this.dataSocket.close();
         this.numOfOps++;
     }
