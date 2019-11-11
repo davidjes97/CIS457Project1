@@ -35,7 +35,7 @@ class ClientServerHandler extends Thread{
     private Socket dataSocket;
 
     private boolean connectionIsLive;
-    protected boolean welcomeFlag;
+    protected boolean initialConnection;
     
     private DataInputStream dataFromClient;
     private DataOutputStream outToClient;
@@ -52,7 +52,7 @@ class ClientServerHandler extends Thread{
             outToClient = new DataOutputStream(connectionSocket.getOutputStream());
             inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 
-            this.welcomeFlag = true;
+            this.initialConnection = true;
             this.connectionIsLive = true;
             System.out.println("Connection Established");
         } catch (IOException ioEx) {
@@ -67,7 +67,7 @@ class ClientServerHandler extends Thread{
 
         try{
             while(connectionIsLive){
-                if (welcomeFlag){
+                if (initialConnection){
                     String userInfo = this.inFromClient.readLine();
                     getInitialRequest(userInfo);
                 } else {
@@ -114,30 +114,31 @@ class ClientServerHandler extends Thread{
 
     private void getInitialRequest(String userInfo) throws Exception{
         System.out.println(userInfo);
-        System.out.println("Users data received");
+
         StringTokenizer parseUserInfo = new StringTokenizer(userInfo);
-        System.out.println("First Token");
+
         String userName = parseUserInfo.nextToken();
-        System.out.println("Second Token");
-        String speed = parseUserInfo.nextToken();
-        System.out.println("Third Token");
         String hostName = parseUserInfo.nextToken();
-        System.out.println("done with Token");
+        String speed = parseUserInfo.nextToken();
+        String port = parseUserInfo.nextToken();
+
         UserElement user = new UserElement(userName, speed, hostName);
-        System.out.println("Adding the user");
-        addUser(user);
 
-        this.dataFromClient = new DataInputStream(new BufferedInputStream(this.dataSocket.getInputStream()));
+        retrieveFiles(port);
+       
+       
+        // addUser(user);
 
-        System.out.println("User added");
 
-        File file = getFile();
-        ArrayList<FileElement> files = parseData(file, user);
-        addContent(files);
-        this.welcomeFlag = false;
-        System.out.println("Initial connection completed");
-        this.dataFromClient.close();
-        this.dataSocket.close();
+        // this.dataFromClient = new DataInputStream(new BufferedInputStream(this.dataSocket.getInputStream()));
+        
+        // File file = getFile();
+        // ArrayList<FileElement> files = parseData(file, user);
+        // addContent(files);
+        // this.initialConnection = false;
+        // System.out.println("Initial connection completed");
+        // this.dataFromClient.close();
+        // this.dataSocket.close();
     }
 
     private File getFile() throws Exception{
@@ -191,6 +192,25 @@ class ClientServerHandler extends Thread{
           System.out.println("Adding elements to the filelist");
           fileList.addAll(newData);
         }
+      }
+      
+      private void retrieveFiles(String port) throws Exception{
+
+        ServerSocket dataServerSocket = new ServerSocket(Integer.parseInt(port));
+        Socket dataSocket = dataServerSocket.accept();
+
+        DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+        boolean notEnd = true;
+        String modifiedSentence = "";
+        while (notEnd) {
+            modifiedSentence = inData.readUTF();
+            if (modifiedSentence.equals("EOF")) {
+                notEnd = false;
+            } else 
+                System.out.print(modifiedSentence);
+            
+        }
+        notEnd = true;
       }
 
 }

@@ -277,11 +277,11 @@ public class hostGUI extends JFrame implements ActionListener {
 
 			try
 			{
-				ClientHandler client = new ClientHandler(hostIP, port); //want to have centralized server display that this user connected
+				ClientHandler client = new ClientHandler(hostIP, port, userName, hostName, speed); //want to have centralized server display that this user connected
 				commandArea.append("connected to " + hostIP + " " + port + ".\n");
 			}
 			catch(Exception E){
-				commandArea.append("Problem Connecting to:" + hostIP + " " + port + ".\n");
+				commandArea.append("Problem Connecting or sending files to:" + hostIP + " " + port + ".\n");
 			}
 		}
 		else if(e.getSource() == searchBut){
