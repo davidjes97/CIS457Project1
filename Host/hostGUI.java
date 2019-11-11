@@ -1,9 +1,7 @@
-import java.awt.EventQueue;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
-
+import java.awt.EventQueue;
 import javax.swing.*;
 /*****************************************************************
 * Host GUI supports the front end for three user functions:
@@ -15,7 +13,6 @@ import javax.swing.*;
 * @author Jesse David
 * @author Josh Gorodinsky
 * @author Isaac Dessert
-* @author Stefan Kiser
 *
 * @version Fall 2019
 ******************************************************************/
@@ -64,8 +61,8 @@ public class hostGUI extends JFrame implements ActionListener {
 	private JTextField keywordTXT;
 	/**Button that will initiate the search on the centralized server*/
 	private JButton searchBut;
-	/**Text Area that will display name of file, name of host, and description of the file */
-	JTextArea searchArea;
+	/**Table that will display name of file, name of host, and description of the file */
+	JTable searchTable;
 	/**Adds a scrollbar to the text area displaying results from keyword search*/
 	JScrollPane scroll;
 
@@ -92,8 +89,6 @@ public class hostGUI extends JFrame implements ActionListener {
 			public void run(){
 				try{
 					hostGUI hgui = new hostGUI();
-					hgui.pack();
-					hgui.setVisible(true);
 					ftpserver server = new ftpserver();
 					Thread thread = new Thread(server);
 					thread.start();
@@ -186,16 +181,12 @@ public class hostGUI extends JFrame implements ActionListener {
 		/**FOR THE KEYWORD SEARCH SECTION */
 
 		/**Array to display files from keyword search. */
-		String[] fileListArray = new String[] {"Speed\t||  HostName   \t||  filename", "Ethernet\t||  191.12.32.96\t||  example.txt"};
+		String[] colNames = new String[] {"Speed", "Hostname", "Filename"};
+		String[][] fileListArray = new String[][] {{"Ethernet", "191.12.32.96",  "example.txt"}};
 
-		/**Create text area to show list of retirved files with hostname and speed */
-		searchArea = new JTextArea(700,150);
-		for(int a = 0; a < fileListArray.length; a++)
-		{
-			searchArea.append(fileListArray[a] + "\n");
-		}
-		searchArea.setEditable(false); //user can't edit this text area 
-		scroll = new JScrollPane(searchArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		/**Create Table to show list of retirved files with hostname and speed */
+		searchTable = new JTable(fileListArray, colNames);
+		scroll = new JScrollPane(searchTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
 		/**Initialize Variables */
 		keywordTXT = new JTextField("",10);
@@ -234,10 +225,6 @@ public class hostGUI extends JFrame implements ActionListener {
 
 		/**create text area for user to see server esponse and entered commands */
 		commandArea = new JTextArea(600,200);
-		for(int a = 0; a < fileListArray.length; a++)
-		{
-			commandArea.append(fileListArray[a] + "\n");
-		}
 		commandArea.setEditable(false); //user can't edit this text area 
 		commandScroll = new JScrollPane(commandArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
