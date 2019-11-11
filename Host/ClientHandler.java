@@ -2,35 +2,6 @@ import java.io. *;
 import java.net. *;
 import java.util. *;
 
-// public class FTPClient {
-
-//     private static ServerSocket welcomeSocket;
-
-//     public static void main(String argv[])throws Exception {
-//         try {
-//             welcomeSocket = new ServerSocket(12000);
-
-//         } catch (IOException ioEx) {
-//             System.out.println("\nUnable to set up port!");
-//             System.exit(1);
-//         }
-
-//         while (true) {
-//             try{
-//                 Socket connectionSocket = welcomeSocket.accept();
-
-//                 System.out.println("\nNew client accepted.\n");
-//                 ClientHandler handler = new ClientHandler(connectionSocket);
-
-//                 handler.start();
-//             }
-//             catch(Exception e){
-//                 e.printStackTrace();
-//             }
-//         }
-//     }
-// }
-
 public class ClientHandler{
 
     private int controlPort;

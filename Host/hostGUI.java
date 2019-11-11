@@ -95,7 +95,6 @@ public class hostGUI extends JFrame implements ActionListener {
 					hgui.pack();
 					hgui.setVisible(true);
 					ftpserver server = new ftpserver();
-					FTPClient client = new FTPClient();
 					Thread thread = new Thread(server);
 					thread.start();
 				} catch(Exception e){
@@ -269,13 +268,21 @@ public class hostGUI extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource() == connectBut) {	
+
 			String hostIP = hostIPTXT.getText();
 			int port = Integer.parseInt(portTXT.getText());
 			String userName = userNameTXT.getText();
 			String hostName = hostNameTXT.getText();
-			String speed = (String) speedList.getSelectedItem();	//might not work
-			commandArea.append(hostIP + " " + port + " connected.\n");		//this will need to be deleted, not how were actually supposed to do this
-																	//want to have centralized server display that this user connected
+			String speed = (String) speedList.getSelectedItem();
+
+			try
+			{
+				ClientHandler client = new ClientHandler(hostIP, port); //want to have centralized server display that this user connected
+				commandArea.append("connected to " + hostIP + " " + port + ".\n");
+			}
+			catch(Exception E){
+				commandArea.append("Problem Connecting to:" + hostIP + " " + port + ".\n");
+			}
 		}
 		else if(e.getSource() == searchBut){
 			String keyword = keywordTXT.getText();
