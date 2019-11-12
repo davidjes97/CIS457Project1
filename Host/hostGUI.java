@@ -85,6 +85,7 @@ public class hostGUI extends JFrame implements ActionListener {
 	private String userName;
 	private String hostName;
 	private String speed;
+	protected ClientHandler client;
 
     
     /**********************************************
@@ -271,7 +272,7 @@ public class hostGUI extends JFrame implements ActionListener {
 
 			try
 			{
-				ClientHandler client = new ClientHandler(hostIP, port, userName, hostName, speed);
+				client = new ClientHandler(hostIP, port, userName, hostName, speed);
 				commandArea.append("connected to " + hostIP + " " + port + ".\n");
 			}
 			catch(Exception E){
@@ -285,19 +286,19 @@ public class hostGUI extends JFrame implements ActionListener {
 		}
 		else if(e.getSource() == goBut){
 			/** used to get the command the user has entered*/
-			hostIP = hostIPTXT.getText();
-			port = Integer.parseInt(portTXT.getText());
-			userName = userNameTXT.getText();
-			hostName = hostNameTXT.getText();
-			speed = (String) speedList.getSelectedItem();
-			ClientHandler remoteClient = new ClientHandler(hostIP, port, userName, hostName, speed);
-			//StringTokenizer tokenizer = new StringTokenizer(commandTXT.getText());
-			//String command = tokenizer.nextToken();
+			// hostIP = hostIPTXT.getText();
+			// port = Integer.parseInt(portTXT.getText());
+			// userName = userNameTXT.getText();
+			// hostName = hostNameTXT.getText();
+			// speed = (String) speedList.getSelectedItem();
+			//ClientHandler remoteClient = new ClientHandler(hostIP, port, userName, hostName, speed);
+			StringTokenizer tokenizer = new StringTokenizer(commandTXT.getText());
+			String command = tokenizer.nextToken();
 
-			String response = remoteClient.runCommand(commandTXT.getText());
-			commandArea.append(response);
+			// String response = client.runCommand(commandTXT.getText());
+			// commandArea.append(response);
 
-			/*if(command.equals("quit"))
+			if(command.equals("quit"))
 			{
 				dispose();
 				//call the quit function
@@ -316,7 +317,7 @@ public class hostGUI extends JFrame implements ActionListener {
 			else
 			{
 				commandArea.append("Invalid command! \nValid commands are: 'connect IP Port' || 'retr filename.txt' || 'quit'\n");
-			}*/
+			}
 		}
 	}
 }

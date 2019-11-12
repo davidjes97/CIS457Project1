@@ -1,6 +1,6 @@
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io. *;
+import java.net. *;
+import java.util. *;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -11,23 +11,21 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.*;
 
-
 class centralServer {
 
     private static ServerSocket welcomeSocket;
     public static void main(String argv[])throws Exception {
         try {
-            welcomeSocket = new ServerSocket(8000);
+            welcomeSocket = new ServerSocket(12000);
 
         } catch (IOException ioEx) {
             System.out.println("\nUnable to set up port!");
-            System.out.println(ioEx);
             System.exit(1);
         }
 
         while (true) {
             Socket connectionSocket = welcomeSocket.accept();
-            
+
             System.out.println("\nNew client accepted.\n");
             ClientServerHandler handler = new ClientServerHandler(connectionSocket);
 
