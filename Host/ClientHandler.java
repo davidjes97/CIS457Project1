@@ -1,6 +1,6 @@
-import java.io. *;
-import java.net. *;
-import java.util. *;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 public class ClientHandler{
 
@@ -15,7 +15,7 @@ public class ClientHandler{
 
     private int numOfOps;
     private int globalPort;
-    private int startingPort = 8000;
+    private int startingPort = 12000;
     final File folder = new File("file_folder/");
 
     public ClientHandler(String serverName, int controlPort, String userName, String hostName, String speed) throws Exception {
@@ -52,41 +52,15 @@ public class ClientHandler{
     }
 
     //Retrieves a file from a user
-    // private void retrieveFile(String fileName) throws Exception{
-    //     FileOutputStream retrievedFile = new FileOutputStream(fileName);
-    //     byte[] fileData = new byte[1024];
-    //     int bytes = 0;
+    private void retrieveFile(String fileName) throws Exception{
+        FileOutputStream retrievedFile = new FileOutputStream(folder + fileName);
+        byte[] fileData = new byte[1024];
+        int bytes = 0;
 
-    //     while((bytes = dataIn.read(fileData)) != -1){
-    //         retrievedFile.write(fileData, 0 ,bytes);
-    //     }
-    //     retrievedFile.close();
-    // }
-
-    private void retrieveFile(String fileName) throws Exception {
-        int filePort = getNewPort();
-        outToServer.writeBytes(port + " " + fileName + " " + '\n');
-
-        ServerSocket fileWelcomeSocket = new ServerSocket(filePort);
-        Socket fileDataSocket = fileWelcomeSocket.accept();
-        DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-        int read = 0;
-        byte[] buffer = new byte[4096];
-        
-        FileOutputStream fos = new FileOutputStream(fileName);
-        long fileSize = inData.readLong();
-        long remaining = fileSize;
-
-        System.out.println("Downloading File.....");
-
-        while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int)remaining)))> 0) {
-            remaining -= (long)read;
-            fos.write(buffer, 0, read);
+        while((bytes = dataIn.read(fileData)) != -1){
+            retrievedFile.write(fileData, 0 ,bytes);
         }
-        System.out.println("\nFile Successfully downloaded.");
-        fileWelcomeSocket.close();
-        inData.close();
-        dataSocket.close();
+        retrievedFile.close();
     }
 
 
@@ -110,7 +84,7 @@ public class ClientHandler{
 
     private void sendList(String userName, String hostName, String speed) throws Exception {
 
-        setNewPort();
+                setNewPort();
 
                 //TODO: Get port from server
                 outToServer.writeBytes(userName + " " + hostName + " " + speed + " " + globalPort + " " + '\n');
