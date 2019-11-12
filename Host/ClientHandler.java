@@ -7,6 +7,7 @@ public class ClientHandler{
     private int controlPort;
 
     private ServerSocket welcomeSocket;
+    private ServerSocket dataServerSocket;
     private Socket dataSocket;
     private Socket connectionSocket;
 
@@ -63,18 +64,6 @@ public class ClientHandler{
         retrievedFile.close();
     }
 
-
-    // private void initializeConnection(String sentence) throws Exception{
-
-
-    //     this.welcomeSocket = new ServerSocket(getNewPort());
-
-    //     outToServer.writeBytes(this.getNewPort() + " " + sentence + " " + '\n');
-
-    //     this.dataSocket = this.welcomeSocket.accept();
-    //     this.dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-    // }
-
     private void closeAllConnections() throws Exception{
         this.dataIn.close();
         this.welcomeSocket.close();
@@ -95,7 +84,6 @@ public class ClientHandler{
                 if(temp == null){
                 dataOutToClient.writeUTF("EOF");
                 }
-                System.out.println("Here4");
                 for (int i=0; i < temp.length; ++i) {
                         dataOutToClient.writeUTF (temp[i].getName() + "" + '\n');  
                 }
@@ -103,6 +91,29 @@ public class ClientHandler{
                 dataOutToClient.close();
                 dataSocket.close();
                 System.out.println("Data Socket closed");
+    }
+
+    public void sendKeyword(String keyword) throws Exception {
+        setNewPort();
+        outToServer.writeBytes(globalPort + " " + keyword + " " + '\n');
+        dataServerSocket = new ServerSocket(globalPort);
+        dataSocket = dataServerSocket.accept();
+        dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+        
+    }
+
+    public String retrieveFileNames() throws Exception {
+
+        String sentence;
+        sentence = dataIn.readUTF();
+        return sentence;
+
+    }
+
+    public void cleanUp() throws Exception {
+        dataServerSocket.close();
+        dataSocket.close();
+        System.out.println("Data Socket closed");
     }
 }
 

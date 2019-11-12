@@ -3,6 +3,7 @@ import java.awt.event.ActionListener;
 import java.util.*;
 import java.awt.EventQueue;
 import javax.swing.*;
+import javax.swing.table.*;
 /*****************************************************************
 * Host GUI supports the front end for three user functions:
 * 1. User can connect to centralized server
@@ -112,7 +113,6 @@ public class hostGUI extends JFrame implements ActionListener {
 		setTitle("GV-NAPSTER Host");
 		getContentPane();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		/**ADDING IN BUTTON BINDING 
 		 * Helped by Uluk Biy on Stack Overflow
 		 * Link: https://stackoverflow.com/questions/23040531/how-to-disable-button-when-textfield-is-empty
@@ -189,11 +189,8 @@ public class hostGUI extends JFrame implements ActionListener {
 		/**FOR THE KEYWORD SEARCH SECTION */
 
 		/**Array to display files from keyword search. */
-		String[] colNames = new String[] {"Speed", "Hostname", "Filename"};
-		String[][] fileListArray = new String[][] {{"Ethernet", "191.12.32.96",  "example.txt"}};
-
 		/**Create Table to show list of retirved files with hostname and speed */
-		searchTable = new JTable(fileListArray, colNames);
+		searchTable = new JTable(new DefaultTableModel(new Object[]{"FileName", "Hostname", "Speed"}, 0));
 		scroll = new JScrollPane(searchTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
 		/**Initialize Variables */
@@ -274,6 +271,7 @@ public class hostGUI extends JFrame implements ActionListener {
 			{
 				client = new ClientHandler(hostIP, port, userName, hostName, speed);
 				commandArea.append("connected to " + hostIP + " " + port + ".\n");
+				connectBut.setEnabled(false);
 			}
 			catch(Exception E){
 				System.out.println(E);
@@ -281,8 +279,34 @@ public class hostGUI extends JFrame implements ActionListener {
 			}
 		}
 		else if(e.getSource() == searchBut){
-			String keyword = keywordTXT.getText();
-			
+			if(client == null) {
+				commandArea.append("You need to connect to a server first before you search a keyword.\n");
+			}
+			else if(keywordTXT.getText().isEmpty()){
+				commandArea.append("Please Enter a Keyword.\n");
+			}
+			else{
+			try {
+				DefaultTableModel model = (DefaultTableModel) searchTable.getModel();
+				model.setRowCount(0);			
+				String keyword = keywordTXT.getText();
+				client.sendKeyword(keyword);
+				String temporary;
+			do{
+			temporary = client.retrieveFileNames();
+			if(!temporary.equals("EOF")){
+				StringTokenizer token = new StringTokenizer(temporary);
+
+                model.addRow(new Object[]{token.nextToken(), token.nextToken(), token.nextToken()});
+			}
+			}while(!temporary.equals("EOF"));
+			client.cleanUp();
+			if(model.getRowCount()==0){commandArea.append("No files with that keyword.\n");}
+			}
+			catch (Exception E){
+				System.out.println(E);	
+			}
+			}
 		}
 		else if(e.getSource() == goBut){
 			/** used to get the command the user has entered*/
