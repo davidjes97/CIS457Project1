@@ -49,7 +49,7 @@ class FTPClient {
                 {
 
                     port = port + 2;
-                    outToServer.writeBytes(port + " " + sentence + " " + '\n');
+                    outToServer.writeString(port + " " + sentence + " " + '\n');
 
                     ServerSocket welcomeData = new ServerSocket(port);
                     Socket dataSocket = welcomeData.accept();
