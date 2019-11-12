@@ -9,6 +9,7 @@ public class ClientHandler {
     private ServerSocket welcomeSocket;
     private Socket dataSocket;
     private Socket connectionSocket;
+    private Socket fileWelcomeSocket;
 
     private DataInputStream dataIn;
     private DataOutputStream outToServer;
@@ -56,11 +57,11 @@ public class ClientHandler {
 
     // Retrieves a file from a user
     private void retrieveFile(String fileName)throws Exception {
-        initialDataPort = initialDataPort + 2;
+        int port = setNewPort();
         System.out.println("Woah someone is trying to get" + fileName);
-        outToServer.writeBytes(initialDataPort + " " + "retr:" + " " + fileName + " " + '\n');
+        outToServer.writeBytes(port + " " + "retr:" + " " + fileName + " " + '\n');
 
-        ServerSocket fileWelcomeSocket = new ServerSocket(initialDataPort);
+        ServerSocket fileWelcomeSocket = new ServerSocket(port);
         Socket fileDataSocket = fileWelcomeSocket.accept();
         DataInputStream inData = new DataInputStream(new BufferedInputStream(fileDataSocket.getInputStream()));
         int read = 0;
@@ -91,7 +92,7 @@ public class ClientHandler {
         
         try{
             fileWelcomeSocket = new Socket(fileServerName, initialDataPort);
-        }catch(exception welcomeException){
+        }catch(Exception welcomeException){
             System.out.println(welcomeException);
         }
     }

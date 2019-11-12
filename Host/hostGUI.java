@@ -316,7 +316,13 @@ public class hostGUI extends JFrame implements ActionListener {
 				
                 // call the retr function, look at remote host connected with that file
                 // probably have to iterate through array till specified filename is found
-            } else if (command.equals("connect")) {
+            } else if (command.equals("connect:")) {
+                try{
+                    client.runCommand(command);
+                }catch(Exception cE){
+                    commandArea.append("Exception found: " + cE);
+                }
+                
                 String IPaddress = tokenizer.nextToken(); // IP address to connect with
                 int remotePort = Integer.parseInt(tokenizer.nextToken()); // portnumber user has entered to connect with
             } else {
