@@ -6,12 +6,13 @@ import javax.xml.parsers.*;
 
 import org.w3c.dom.*;
 
+
 class centralServer {
 
     private static ServerSocket welcomeSocket;
     public static void main(String argv[])throws Exception {
         try {
-            welcomeSocket = new ServerSocket(12000);
+            welcomeSocket = new ServerSocket(8000);
 
         } catch (IOException ioEx) {
             System.out.println("\nUnable to set up port!");

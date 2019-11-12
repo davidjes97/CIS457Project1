@@ -57,7 +57,7 @@ class ftpServerHandler implements Runnable{
     }
 
     private void retrieve(String fileName) throws Exception{
-        FileInputStream fileToClient = new FileInputStream("./ServerFiles/" + fileName);
+        FileInputStream fileToClient = new FileInputStream("./file_folder/" + fileName);
         byte[] fileData = new byte[1024];
         int bytes = 0;
         while ((bytes = fileToClient.read(fileData, 0, fileData.length)) != -1) {
