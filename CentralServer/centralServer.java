@@ -1,6 +1,6 @@
-import java.io. *;
-import java.net. *;
-import java.util. *;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -14,7 +14,7 @@ import org.w3c.dom.*;
 class centralServer {
 
     private static ServerSocket welcomeSocket;
-    public static void main(String argv[])throws Exception {
+    public static void main(String argv[]) throws Exception {
         try {
             welcomeSocket = new ServerSocket(12000);
 
@@ -34,22 +34,19 @@ class centralServer {
     }
 }
 
-class ClientServerHandler extends Thread{
+class ClientServerHandler extends Thread {
 
     private Socket connectionSocket;
     private Socket dataSocket;
 
     private boolean connectionIsLive;
     protected boolean initialConnection;
-    
+
     private DataInputStream dataFromClient;
     private DataOutputStream outToClient;
     private BufferedReader inFromClient;
     private UserElement user;
-
-    protected static Vector<UserElement> userList = new Vector<UserElement>();
-    protected static Vector<FileElement> fileList = new Vector<FileElement>();
-
+    private String filename;
     public ClientServerHandler(Socket socket) {
 
         connectionSocket = socket;
@@ -71,9 +68,9 @@ class ClientServerHandler extends Thread{
         String clientCommand;
         int port;
 
-        try{
-            while(connectionIsLive){
-                if (initialConnection){
+        try {
+            while (connectionIsLive) {
+                if (initialConnection) {
                     String userInfo = this.inFromClient.readLine();
                     getInitialRequest(userInfo);
                 } else {
@@ -82,45 +79,27 @@ class ClientServerHandler extends Thread{
             }
         } catch (Exception e) {
             System.out.println(e);
-            File temp = new File("fileList/" + user.getUserName() + ".xml");
+            File temp = new File(filename);
             temp.delete();
         }
     }
 
-    private void waitForRequest() throws Exception{
-       System.out.println("Waiting for request");
-       String fromClient = this.inFromClient.readLine();
-       System.out.println("Keyword received");
-       processRequest(fromClient);
+    private void waitForRequest() throws Exception {
+        System.out.println("Waiting for request");
+        String fromClient = this.inFromClient.readLine();
+        System.out.println("Keyword received");
+        processRequest(fromClient);
     }
 
-    private void processRequest(String sentence) throws Exception{
+    private void processRequest(String sentence) throws Exception {
         StringTokenizer tokens = new StringTokenizer(sentence);
 
         System.out.println("Keyword searched");
-        searchKeyword(tokens.nextToken());
+        sendFile(tokens.nextToken(), tokens.nextToken());
     }
 
-    private void searchKeyword(String keyword) throws Exception{
-        synchronized (fileList){
-            synchronized (userList){
-                String output = "";
 
-                for (int i = 0; i < ClientServerHandler.fileList.size(); i++){
-                    FileElement fileEntry = (FileElement) ClientServerHandler.fileList.get(i);
-                    String description = fileEntry.getDescription();
-                    if (description.contains(keyword)){
-                        UserElement user = fileEntry.getUser();
-                        output += user.getSpeed() + " " + user.getHostName() + " " + fileEntry.getFileName() + "\t";
-                    }
-                }
-                System.out.println("Sending back: " + "output will go here");
-                this.outToClient.writeBytes(output + "\n");
-            }
-        }
-    }
-
-    private void getInitialRequest(String userInfo) throws Exception{
+    private void getInitialRequest(String userInfo) throws Exception {
         System.out.println(userInfo);
 
         StringTokenizer parseUserInfo = new StringTokenizer(userInfo);
@@ -133,81 +112,17 @@ class ClientServerHandler extends Thread{
         user = new UserElement(userName, speed, hostName);
 
         retrieveFiles(port);
-       
-       
-        // addUser(user);
 
-
-        // this.dataFromClient = new DataInputStream(new BufferedInputStream(this.dataSocket.getInputStream()));
-        
-        // File file = getFile();
-        // ArrayList<FileElement> files = parseData(file, user);
-        // addContent(files);
-        // this.initialConnection = false;
-        // System.out.println("Initial connection completed");
-        // this.dataFromClient.close();
-        // this.dataSocket.close();
+        this.initialConnection = false;
+        System.out.println("Initial connection completed with: " + userName);
     }
 
-    private File getFile() throws Exception{
-        System.out.println("A client is sending a xml file...");
-        FileOutputStream fos = new FileOutputStream("temp.xml");
-        System.out.println("File Stream Created");
-        byte[] fileData = new byte [1024];
-        int bytes = 0;
-        while ((bytes = this.dataFromClient.read(fileData)) != -1){
-            System.out.println("Bytes received: " + bytes);
-            fos.write(fileData, 0, bytes);
-            System.out.println("end");
-        }
-        System.out.println("File received!");
-        fos.close();
-        File file = new File("temp.xml");
-        return file;
-    }
-
-    private ArrayList<FileElement> parseData(File file, UserElement user) throws Exception {
-        ArrayList<FileElement> dataList = new ArrayList<FileElement>();
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(file);
-        doc.getDocumentElement().normalize();// Make sure there are no funky things going on in the parser
-        NodeList nList = doc.getElementsByTagName("file");
-        for (int i = 0; i < nList.getLength(); i++) {
-          Node node = nList.item(i);
-          System.out.println("\nCurrent Element :" + node.getNodeName());
-          if (node.getNodeType() == Node.ELEMENT_NODE) {
-            Element eTemp = (Element) node;
-            System.out.println(eTemp.getElementsByTagName("name").item(0).getTextContent());
-            System.out.println(eTemp.getElementsByTagName("description").item(0).getTextContent());
-            dataList.add(new FileElement(user, eTemp.getElementsByTagName("name").item(0).getTextContent(), eTemp.getElementsByTagName("description").item(0).getTextContent()));
-          }
-        }
-        file.delete();
-        return dataList;
-      }
-    
-      private void addUser(UserElement newUser) {
-        synchronized (userList) {
-            System.out.println("Adding user to the list");
-          userList.addElement(newUser);
-          System.out.println("added user to the list");
-        }
-      }
-    
-      private void addContent(ArrayList<FileElement> newData) {
-        synchronized (fileList) {
-          System.out.println("Adding elements to the filelist");
-          fileList.addAll(newData);
-        }
-      }
-      
-      private void retrieveFiles(String port) throws Exception{
+    private void retrieveFiles(String port) throws Exception {
 
         ServerSocket dataServerSocket = new ServerSocket(Integer.parseInt(port));
         Socket dataSocket = dataServerSocket.accept();
 
-         
+
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.newDocument();
@@ -222,38 +137,88 @@ class ClientServerHandler extends Thread{
         boolean notEnd = true;
         String modifiedSentence = "";
 
+        String f= "";
+        while(new File("fileList/" + user.getUserName() + f + ".xml").exists())
+        f= f + "z";
+        filename = "fileList/" + user.getUserName() + f + ".xml";
+
         while (notEnd) {
             modifiedSentence = inData.readUTF();
             if (modifiedSentence.equals("EOF")) {
                 notEnd = false;
-            } 
-            else {
+            } else {
 
-            file = doc.createElement("file");
-            hierarchy.appendChild(file);
+                file = doc.createElement("file");
+                hierarchy.appendChild(file);
 
-            attrType = doc.createElement("hostname");    
-            attrType.appendChild(doc.createTextNode(user.getUserName()));
-            file.appendChild(attrType);
+                attrType = doc.createElement("hostname");
+                attrType.appendChild(doc.createTextNode(user.getHostName()));
+                file.appendChild(attrType);
 
-            attrType1 = doc.createElement("speed");
-            attrType1.appendChild(doc.createTextNode(user.getHostName()));
-            file.appendChild(attrType1);
-            
-            attrType2 = doc.createElement("filename");
-            attrType2.appendChild(doc.createTextNode(modifiedSentence));
-            file.appendChild(attrType2);
+                attrType1 = doc.createElement("speed");
+                attrType1.appendChild(doc.createTextNode(user.getSpeed()));
+                file.appendChild(attrType1);
 
-            
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File("fileList/" + user.getUserName() + ".xml"));
-             transformer.transform(source, result);
+                attrType2 = doc.createElement("filename");
+                attrType2.appendChild(doc.createTextNode(modifiedSentence));
+                file.appendChild(attrType2);
+
+
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(new File(filename));
+                transformer.transform(source, result);
             }
         }
         notEnd = true;
 
-      }
+    }
 
+    private void sendFile(String port, String keyword) {
+
+        try {
+        Socket dataSocket = new Socket(connectionSocket.getInetAddress(), Integer.parseInt(port));
+        DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+        Node nNode;
+        NodeList nList;
+        String hostName;
+        String speed;
+            File inputFile;
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc;
+            File folder = new File("fileList/");
+            File[] temp = folder.listFiles();
+
+            if (temp == null) {
+                dataOutToClient.writeUTF("EOF");
+            }
+            for (int i = 0; i < temp.length; ++i) {
+                inputFile = temp[i];
+                doc = dBuilder.parse(inputFile);
+                doc.getDocumentElement().normalize();
+                nList = doc.getElementsByTagName("file");
+               // dataOutToClient.writeUTF(temp[i].getName() + "" + '\n');
+                for (int num = 0; num < nList.getLength(); num++) {
+                    nNode = nList.item(num);
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element eElement = (Element) nNode;
+                        if(eElement.getElementsByTagName("filename").item(0).getTextContent().contains(keyword))
+                            dataOutToClient.writeUTF(eElement.getElementsByTagName("filename").item(0).getTextContent() + " " 
+                            + eElement.getElementsByTagName("hostname").item(0).getTextContent() + " " 
+                            + eElement.getElementsByTagName("speed").item(0).getTextContent() + " " + '\n');
+                    }
+                }
+            }
+        dataOutToClient.writeUTF("EOF");
+        dataOutToClient.close();
+        dataSocket.close();
+        System.out.println("Data Socket closed");
+    } catch (IOException ioEx) {
+        ioEx.printStackTrace();
+    } catch (Exception E) {
+        E.printStackTrace();
+    }
+    }
 }
