@@ -7,6 +7,7 @@ public class ClientHandler {
     private int controlPort;
 
     private ServerSocket welcomeSocket;
+    private ServerSocket dataServerSocket;
     private Socket dataSocket;
     private Socket connectionSocket;
     private Socket fileWelcomeSocket;
@@ -145,21 +146,43 @@ public class ClientHandler {
 
         setNewPort();
 
-        // TODO: Get port from server
-        outToServer.writeBytes(userName + " " + hostName + " " + speed + " " + globalPort + " " + '\n');
-        // Setting stuff up
-        Socket dataSocket = new Socket(connectionSocket.getInetAddress(), globalPort);
-        DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-        File[] temp = folder.listFiles();
-        if (temp == null) {
-            dataOutToClient.writeUTF("EOF");
-        }
-        System.out.println("Here4");
-        for (int i = 0; i < temp.length; ++i) {
-            dataOutToClient.writeUTF(temp[i].getName() + "" + '\n');
-        }
-        dataOutToClient.writeUTF("EOF");
-        dataOutToClient.close();
+                //TODO: Get port from server
+                outToServer.writeBytes(userName + " " + hostName + " " + speed + " " + globalPort + " " + '\n');
+                //Setting stuff up
+                Socket dataSocket = new Socket(connectionSocket.getInetAddress(), globalPort);
+                DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+                File[] temp = folder.listFiles();
+                if(temp == null){
+                dataOutToClient.writeUTF("EOF");
+                }
+                for (int i=0; i < temp.length; ++i) {
+                        dataOutToClient.writeUTF (temp[i].getName() + "" + '\n');  
+                }
+                dataOutToClient.writeUTF("EOF");
+                dataOutToClient.close();
+                dataSocket.close();
+                System.out.println("Data Socket closed");
+    }
+
+    public void sendKeyword(String keyword) throws Exception {
+        setNewPort();
+        outToServer.writeBytes(globalPort + " " + keyword + " " + '\n');
+        dataServerSocket = new ServerSocket(globalPort);
+        dataSocket = dataServerSocket.accept();
+        dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+        
+    }
+
+    public String retrieveFileNames() throws Exception {
+
+        String sentence;
+        sentence = dataIn.readUTF();
+        return sentence;
+
+    }
+
+    public void cleanUp() throws Exception {
+        dataServerSocket.close();
         dataSocket.close();
         System.out.println("Data Socket closed");
     }
