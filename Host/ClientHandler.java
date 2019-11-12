@@ -112,26 +112,23 @@ public class ClientHandler{
 
         setNewPort();
 
-        //TODO: Get port from server
-        outToServer.writeBytes(userName + " " + hostName + " " + speed + " " + globalPort + " " + '\n');
-        //Setting stuff up
-        System.out.println("Here1");
-        Socket dataSocket = new Socket(connectionSocket.getInetAddress(), globalPort);
-        DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-        System.out.println("Here2");
-        File[] temp = folder.listFiles();
-        System.out.println("Here3");
-        if(temp == null){
-        dataOutToClient.writeUTF("Folder does not exist.\n");
-        }
-        System.out.println("Here4");
-        for (int i=0; i < temp.length; ++i) {
-                dataOutToClient.writeUTF (temp[i].getName() + "" + '\n');  
-        }
-        dataOutToClient.writeUTF("EOF");
-        dataOutToClient.close();
-        dataSocket.close();
-        System.out.println("Data Socket closed");
+                //TODO: Get port from server
+                outToServer.writeBytes(userName + " " + hostName + " " + speed + " " + globalPort + " " + '\n');
+                //Setting stuff up
+                Socket dataSocket = new Socket(connectionSocket.getInetAddress(), globalPort);
+                DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+                File[] temp = folder.listFiles();
+                if(temp == null){
+                dataOutToClient.writeUTF("EOF");
+                }
+                System.out.println("Here4");
+                for (int i=0; i < temp.length; ++i) {
+                        dataOutToClient.writeUTF (temp[i].getName() + "" + '\n');  
+                }
+                dataOutToClient.writeUTF("EOF");
+                dataOutToClient.close();
+                dataSocket.close();
+                System.out.println("Data Socket closed");
     }
 }
 

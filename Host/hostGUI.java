@@ -79,6 +79,13 @@ public class hostGUI extends JFrame implements ActionListener {
 	/**Adds a scrollbar to the commandArea*/
 	JScrollPane commandScroll;
 
+	/**Used to get user input*/
+	private String hostIP;
+	private int port;
+	private String userName;
+	private String hostName;
+	private String speed;
+
     
     /**********************************************
     * Runs the GUI
@@ -256,11 +263,11 @@ public class hostGUI extends JFrame implements ActionListener {
 		
 		if(e.getSource() == connectBut) {	
 
-			String hostIP = hostIPTXT.getText();
-			int port = Integer.parseInt(portTXT.getText());
-			String userName = userNameTXT.getText();
-			String hostName = hostNameTXT.getText();
-			String speed = (String) speedList.getSelectedItem();
+			hostIP = hostIPTXT.getText();
+			port = Integer.parseInt(portTXT.getText());
+			userName = userNameTXT.getText();
+			hostName = hostNameTXT.getText();
+			speed = (String) speedList.getSelectedItem();
 
 			try
 			{
@@ -268,19 +275,29 @@ public class hostGUI extends JFrame implements ActionListener {
 				commandArea.append("connected to " + hostIP + " " + port + ".\n");
 			}
 			catch(Exception E){
+				System.out.println(E);
 				commandArea.append("Problem Connecting or sending files to:" + hostIP + " " + port + ".\n");
-
 			}
 		}
 		else if(e.getSource() == searchBut){
 			String keyword = keywordTXT.getText();
+			
 		}
 		else if(e.getSource() == goBut){
 			/** used to get the command the user has entered*/
-			StringTokenizer tokenizer = new StringTokenizer(commandTXT.getText());
-			String command = tokenizer.nextToken();
+			hostIP = hostIPTXT.getText();
+			port = Integer.parseInt(portTXT.getText());
+			userName = userNameTXT.getText();
+			hostName = hostNameTXT.getText();
+			speed = (String) speedList.getSelectedItem();
+			ClientHandler remoteClient = new ClientHandler(hostIP, port, userName, hostName, speed);
+			//StringTokenizer tokenizer = new StringTokenizer(commandTXT.getText());
+			//String command = tokenizer.nextToken();
 
-			if(command.equals("quit"))
+			String response = remoteClient.runCommand(commandTXT.getText());
+			commandArea.append(response);
+
+			/*if(command.equals("quit"))
 			{
 				dispose();
 				//call the quit function
@@ -298,8 +315,8 @@ public class hostGUI extends JFrame implements ActionListener {
 			}
 			else
 			{
-				commandArea.append("\nInvalid command! \nValid commands are: 'connect IP Port' || 'retr filename.txt' || 'quit'");
-			}
+				commandArea.append("Invalid command! \nValid commands are: 'connect IP Port' || 'retr filename.txt' || 'quit'\n");
+			}*/
 		}
 	}
 }

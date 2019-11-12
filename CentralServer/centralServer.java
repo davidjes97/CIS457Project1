@@ -1,8 +1,13 @@
-import java.io. *;
-import java.net. *;
-import java.util. *;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import javax.xml.parsers.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.*;
 
@@ -16,12 +21,13 @@ class centralServer {
 
         } catch (IOException ioEx) {
             System.out.println("\nUnable to set up port!");
+            System.out.println(ioEx);
             System.exit(1);
         }
 
         while (true) {
             Socket connectionSocket = welcomeSocket.accept();
-
+            
             System.out.println("\nNew client accepted.\n");
             ClientServerHandler handler = new ClientServerHandler(connectionSocket);
 
@@ -41,6 +47,7 @@ class ClientServerHandler extends Thread{
     private DataInputStream dataFromClient;
     private DataOutputStream outToClient;
     private BufferedReader inFromClient;
+    private UserElement user;
 
     protected static Vector<UserElement> userList = new Vector<UserElement>();
     protected static Vector<FileElement> fileList = new Vector<FileElement>();
@@ -77,6 +84,8 @@ class ClientServerHandler extends Thread{
             }
         } catch (Exception e) {
             System.out.println(e);
+            File temp = new File("fileList/" + user.getUserName() + ".xml");
+            temp.delete();
         }
     }
 
@@ -123,7 +132,7 @@ class ClientServerHandler extends Thread{
         String speed = parseUserInfo.nextToken();
         String port = parseUserInfo.nextToken();
 
-        UserElement user = new UserElement(userName, speed, hostName);
+        user = new UserElement(userName, speed, hostName);
 
         retrieveFiles(port);
        
@@ -200,18 +209,53 @@ class ClientServerHandler extends Thread{
         ServerSocket dataServerSocket = new ServerSocket(Integer.parseInt(port));
         Socket dataSocket = dataServerSocket.accept();
 
+         
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.newDocument();
+        Element hierarchy = doc.createElement("files");
+        Element file;
+        Element attrType;
+        Element attrType1;
+        Element attrType2;
+        doc.appendChild(hierarchy);
+
         DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
         boolean notEnd = true;
         String modifiedSentence = "";
+
         while (notEnd) {
             modifiedSentence = inData.readUTF();
             if (modifiedSentence.equals("EOF")) {
                 notEnd = false;
-            } else 
-                System.out.print(modifiedSentence);
+            } 
+            else {
+
+            file = doc.createElement("file");
+            hierarchy.appendChild(file);
+
+            attrType = doc.createElement("hostname");    
+            attrType.appendChild(doc.createTextNode(user.getUserName()));
+            file.appendChild(attrType);
+
+            attrType1 = doc.createElement("speed");
+            attrType1.appendChild(doc.createTextNode(user.getHostName()));
+            file.appendChild(attrType1);
             
+            attrType2 = doc.createElement("filename");
+            attrType2.appendChild(doc.createTextNode(modifiedSentence));
+            file.appendChild(attrType2);
+
+            
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("fileList/" + user.getUserName() + ".xml"));
+             transformer.transform(source, result);
+            }
         }
         notEnd = true;
+
       }
 
 }
