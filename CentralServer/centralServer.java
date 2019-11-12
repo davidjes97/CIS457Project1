@@ -9,7 +9,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.*;
+import org.w3c.dom. *;
 
 class centralServer {
 
@@ -34,14 +34,14 @@ class centralServer {
     }
 }
 
-class ClientServerHandler extends Thread{
+class ClientServerHandler extends Thread {
 
     private Socket connectionSocket;
     private Socket dataSocket;
 
     private boolean connectionIsLive;
     protected boolean initialConnection;
-    
+
     private DataInputStream dataFromClient;
     private DataOutputStream outToClient;
     private BufferedReader inFromClient;
@@ -71,9 +71,9 @@ class ClientServerHandler extends Thread{
         String clientCommand;
         int port;
 
-        try{
-            while(connectionIsLive){
-                if (initialConnection){
+        try {
+            while (connectionIsLive) {
+                if (initialConnection) {
                     String userInfo = this.inFromClient.readLine();
                     getInitialRequest(userInfo);
                 } else {
@@ -87,29 +87,29 @@ class ClientServerHandler extends Thread{
         }
     }
 
-    private void waitForRequest() throws Exception{
-       System.out.println("Waiting for request");
-       String fromClient = this.inFromClient.readLine();
-       System.out.println("Keyword received");
-       processRequest(fromClient);
+    private void waitForRequest()throws Exception {
+        System.out.println("Waiting for request");
+        String fromClient = this.inFromClient.readLine();
+        System.out.println("Keyword received");
+        processRequest(fromClient);
     }
 
-    private void processRequest(String sentence) throws Exception{
+    private void processRequest(String sentence)throws Exception {
         StringTokenizer tokens = new StringTokenizer(sentence);
 
         System.out.println("Keyword searched");
         searchKeyword(tokens.nextToken());
     }
 
-    private void searchKeyword(String keyword) throws Exception{
-        synchronized (fileList){
-            synchronized (userList){
+    private void searchKeyword(String keyword)throws Exception {
+        synchronized(fileList) {
+            synchronized(userList) {
                 String output = "";
 
-                for (int i = 0; i < ClientServerHandler.fileList.size(); i++){
-                    FileElement fileEntry = (FileElement) ClientServerHandler.fileList.get(i);
+                for (int i = 0; i < ClientServerHandler.fileList.size(); i ++) {
+                    FileElement fileEntry = (FileElement)ClientServerHandler.fileList.get(i);
                     String description = fileEntry.getDescription();
-                    if (description.contains(keyword)){
+                    if (description.contains(keyword)) {
                         UserElement user = fileEntry.getUser();
                         output += user.getSpeed() + " " + user.getHostName() + " " + fileEntry.getFileName() + "\t";
                     }
@@ -120,7 +120,7 @@ class ClientServerHandler extends Thread{
         }
     }
 
-    private void getInitialRequest(String userInfo) throws Exception{
+    private void getInitialRequest(String userInfo)throws Exception {
         System.out.println(userInfo);
 
         StringTokenizer parseUserInfo = new StringTokenizer(userInfo);
@@ -133,13 +133,13 @@ class ClientServerHandler extends Thread{
         user = new UserElement(userName, speed, hostName);
 
         retrieveFiles(port);
-       
-       
+
+
         // addUser(user);
 
 
         // this.dataFromClient = new DataInputStream(new BufferedInputStream(this.dataSocket.getInputStream()));
-        
+
         // File file = getFile();
         // ArrayList<FileElement> files = parseData(file, user);
         // addContent(files);
@@ -149,13 +149,13 @@ class ClientServerHandler extends Thread{
         // this.dataSocket.close();
     }
 
-    private File getFile() throws Exception{
+    private File getFile()throws Exception {
         System.out.println("A client is sending a xml file...");
         FileOutputStream fos = new FileOutputStream("temp.xml");
         System.out.println("File Stream Created");
-        byte[] fileData = new byte [1024];
+        byte[] fileData = new byte[1024];
         int bytes = 0;
-        while ((bytes = this.dataFromClient.read(fileData)) != -1){
+        while ((bytes = this.dataFromClient.read(fileData)) != -1) {
             System.out.println("Bytes received: " + bytes);
             fos.write(fileData, 0, bytes);
             System.out.println("end");
@@ -166,48 +166,48 @@ class ClientServerHandler extends Thread{
         return file;
     }
 
-    private ArrayList<FileElement> parseData(File file, UserElement user) throws Exception {
+    private ArrayList<FileElement> parseData(File file, UserElement user)throws Exception {
         ArrayList<FileElement> dataList = new ArrayList<FileElement>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(file);
-        doc.getDocumentElement().normalize();// Make sure there are no funky things going on in the parser
+        doc.getDocumentElement().normalize(); // Make sure there are no funky things going on in the parser
         NodeList nList = doc.getElementsByTagName("file");
-        for (int i = 0; i < nList.getLength(); i++) {
-          Node node = nList.item(i);
-          System.out.println("\nCurrent Element :" + node.getNodeName());
-          if (node.getNodeType() == Node.ELEMENT_NODE) {
-            Element eTemp = (Element) node;
-            System.out.println(eTemp.getElementsByTagName("name").item(0).getTextContent());
-            System.out.println(eTemp.getElementsByTagName("description").item(0).getTextContent());
-            dataList.add(new FileElement(user, eTemp.getElementsByTagName("name").item(0).getTextContent(), eTemp.getElementsByTagName("description").item(0).getTextContent()));
-          }
+        for (int i = 0; i < nList.getLength(); i ++) {
+            Node node = nList.item(i);
+            System.out.println("\nCurrent Element :" + node.getNodeName());
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element eTemp = (Element)node;
+                System.out.println(eTemp.getElementsByTagName("name").item(0).getTextContent());
+                System.out.println(eTemp.getElementsByTagName("description").item(0).getTextContent());
+                dataList.add(new FileElement(user, eTemp.getElementsByTagName("name").item(0).getTextContent(), eTemp.getElementsByTagName("description").item(0).getTextContent()));
+            }
         }
         file.delete();
         return dataList;
-      }
-    
-      private void addUser(UserElement newUser) {
-        synchronized (userList) {
+    }
+
+    private void addUser(UserElement newUser) {
+        synchronized(userList) {
             System.out.println("Adding user to the list");
-          userList.addElement(newUser);
-          System.out.println("added user to the list");
+            userList.addElement(newUser);
+            System.out.println("added user to the list");
         }
-      }
-    
-      private void addContent(ArrayList<FileElement> newData) {
-        synchronized (fileList) {
-          System.out.println("Adding elements to the filelist");
-          fileList.addAll(newData);
+    }
+
+    private void addContent(ArrayList<FileElement> newData) {
+        synchronized(fileList) {
+            System.out.println("Adding elements to the filelist");
+            fileList.addAll(newData);
         }
-      }
-      
-      private void retrieveFiles(String port) throws Exception{
+    }
+
+    private void retrieveFiles(String port)throws Exception {
 
         ServerSocket dataServerSocket = new ServerSocket(Integer.parseInt(port));
         Socket dataSocket = dataServerSocket.accept();
 
-         
+
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.newDocument();
@@ -226,34 +226,33 @@ class ClientServerHandler extends Thread{
             modifiedSentence = inData.readUTF();
             if (modifiedSentence.equals("EOF")) {
                 notEnd = false;
-            } 
-            else {
+            } else {
 
-            file = doc.createElement("file");
-            hierarchy.appendChild(file);
+                file = doc.createElement("file");
+                hierarchy.appendChild(file);
 
-            attrType = doc.createElement("hostname");    
-            attrType.appendChild(doc.createTextNode(user.getUserName()));
-            file.appendChild(attrType);
+                attrType = doc.createElement("hostname");
+                attrType.appendChild(doc.createTextNode(user.getUserName()));
+                file.appendChild(attrType);
 
-            attrType1 = doc.createElement("speed");
-            attrType1.appendChild(doc.createTextNode(user.getHostName()));
-            file.appendChild(attrType1);
-            
-            attrType2 = doc.createElement("filename");
-            attrType2.appendChild(doc.createTextNode(modifiedSentence));
-            file.appendChild(attrType2);
+                attrType1 = doc.createElement("speed");
+                attrType1.appendChild(doc.createTextNode(user.getHostName()));
+                file.appendChild(attrType1);
 
-            
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File("fileList/" + user.getUserName() + ".xml"));
-             transformer.transform(source, result);
+                attrType2 = doc.createElement("filename");
+                attrType2.appendChild(doc.createTextNode(modifiedSentence));
+                file.appendChild(attrType2);
+
+
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(new File("fileList/" + user.getUserName() + ".xml"));
+                transformer.transform(source, result);
             }
         }
         notEnd = true;
 
-      }
+    }
 
 }
