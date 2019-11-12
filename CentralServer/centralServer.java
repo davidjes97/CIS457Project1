@@ -82,6 +82,8 @@ class ClientServerHandler extends Thread{
             }
         } catch (Exception e) {
             System.out.println(e);
+            File temp = new File("fileList/" + user.getUserName() + ".xml");
+            temp.delete();
         }
     }
 
