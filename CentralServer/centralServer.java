@@ -1,6 +1,6 @@
-import java.io. *;
-import java.net. *;
-import java.util. *;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -20,12 +20,13 @@ class centralServer {
 
         } catch (IOException ioEx) {
             System.out.println("\nUnable to set up port!");
+            System.out.println(ioEx);
             System.exit(1);
         }
 
         while (true) {
             Socket connectionSocket = welcomeSocket.accept();
-
+            
             System.out.println("\nNew client accepted.\n");
             ClientServerHandler handler = new ClientServerHandler(connectionSocket);
 

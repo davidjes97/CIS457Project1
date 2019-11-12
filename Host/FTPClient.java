@@ -16,7 +16,7 @@ class FTPClient {
         String statusCode;
         boolean clientgo = true;
 
-        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System. in));
+        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         sentence = inFromUser.readLine();
         StringTokenizer tokens = new StringTokenizer(sentence);
 
