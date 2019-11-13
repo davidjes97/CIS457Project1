@@ -17,7 +17,7 @@ public class ClientHandler {
     private int numOfOps;
     private int globalPort;
     private int startingPort = 12000;
-    private int initialDataPort = 2327;
+    private int initialDataPort = 2328;
     private String fileServerName;
     final File folder = new File("file_folder/");
 
@@ -108,6 +108,31 @@ public class ClientHandler {
         this.dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
     
     }
+
+    // private void connect(String sentence) {
+    //     StringTokenizer tokens = new StringTokenizer(sentence);
+
+    //     fileServerName = tokens.nextToken();
+    //     fileServerName = tokens.nextToken();
+    //     initialDataPort = Integer.parseInt(tokens.nextToken());
+        
+    //     try{
+    //         fileWelcomeSocket = new Socket(fileServerName, initialDataPort);
+    //     }catch(Exception welcomeException){
+    //         System.out.println(welcomeException);
+    //     }
+    // }
+
+    // private void initializeConnection(String sentence) throws Exception{
+
+
+    //     this.welcomeSocket = new ServerSocket(getNewPort());
+
+    //     outToServer.writeBytes(this.getNewPort() + " " + sentence + " " + '\n');
+
+    //     this.dataSocket = this.welcomeSocket.accept();
+    //     this.dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+    // }
 
     private void closeAllConnections()throws Exception {
         this.dataIn.close();

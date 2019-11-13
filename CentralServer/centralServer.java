@@ -104,27 +104,7 @@ class ClientServerHandler extends Thread {
             }
             
         }
-        //     try {
-        // } catch (Exception e) {
-        //     System.out.println(e);
-        //     File temp = new File("fileList/" + user.getUserName() + ".xml");
-        //     temp.delete();
-        // }
     }
-
-    // private void waitForRequest()throws Exception {
-    //     System.out.println("Waiting for request");
-    //     String fromClient = this.inFromClient.readLine();
-    //     System.out.println("Keyword received");
-    //     processRequest(fromClient);
-    // }
-
-    // private void processRequest(String sentence)throws Exception {
-    //     StringTokenizer tokens = new StringTokenizer(sentence);
-
-    //     System.out.println("Keyword searched");
-    //     searchKeyword(tokens.nextToken());
-    // }
 
     private void searchKeyword(String keyword)throws Exception {
         synchronized(fileList) {
