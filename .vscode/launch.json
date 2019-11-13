@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - hostGUI",
+            "request": "launch",
+            "mainClass": "Host.hostGUI",
+            "projectName": "CIS457Project1_ec9f9a89"
+        }
+    ]
+}
