@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><files><file><hostname>host</hostname><speed>wait</speed><filename>jesse_david.txt
-</filename></file><file><hostname>host</hostname><speed>wait</speed><filename>testing.txt
-</filename></file><file><hostname>host</hostname><speed>wait</speed><filename>testing1.txt
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><files><file><hostname>Host</hostname><speed>127.0.0.1</speed><filename>example.txt
+</filename></file><file><hostname>Host</hostname><speed>127.0.0.1</speed><filename>fakeFile.txt
+</filename></file><file><hostname>Host</hostname><speed>127.0.0.1</speed><filename>jesse_david.txt
+</filename></file><file><hostname>Host</hostname><speed>127.0.0.1</speed><filename>testing.txt
+</filename></file><file><hostname>Host</hostname><speed>127.0.0.1</speed><filename>testing1.txt
+</filename></file><file><hostname>Host</hostname><speed>127.0.0.1</speed><filename>transfer.txt
 </filename></file></files>

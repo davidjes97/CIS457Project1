@@ -7,7 +7,6 @@ public class ClientHandler {
     private int controlPort;
 
     private ServerSocket welcomeSocket;
-    private ServerSocket dataServerSocket;
     private Socket dataSocket;
     private Socket connectionSocket;
     private Socket fileWelcomeSocket;
@@ -18,7 +17,7 @@ public class ClientHandler {
     private int numOfOps;
     private int globalPort;
     private int startingPort = 12000;
-    private int initialDataPort = 2327;
+    private int initialDataPort = 2328;
     private String fileServerName;
     final File folder = new File("file_folder/");
 
@@ -36,7 +35,6 @@ public class ClientHandler {
         String command = token.nextToken();
         command = command.toLowerCase();
         System.out.println("In the run command with command: " + command);
-
 
         connect(sentence);
 
@@ -97,7 +95,6 @@ public class ClientHandler {
     }
 
     private void connect(String sentence) throws Exception {
-
         System.out.println("Gonna try to connect to the other host?");
 
         int connectionPort = setNewPort();
@@ -112,6 +109,31 @@ public class ClientHandler {
     
     }
 
+    // private void connect(String sentence) {
+    //     StringTokenizer tokens = new StringTokenizer(sentence);
+
+    //     fileServerName = tokens.nextToken();
+    //     fileServerName = tokens.nextToken();
+    //     initialDataPort = Integer.parseInt(tokens.nextToken());
+        
+    //     try{
+    //         fileWelcomeSocket = new Socket(fileServerName, initialDataPort);
+    //     }catch(Exception welcomeException){
+    //         System.out.println(welcomeException);
+    //     }
+    // }
+
+    // private void initializeConnection(String sentence) throws Exception{
+
+
+    //     this.welcomeSocket = new ServerSocket(getNewPort());
+
+    //     outToServer.writeBytes(this.getNewPort() + " " + sentence + " " + '\n');
+
+    //     this.dataSocket = this.welcomeSocket.accept();
+    //     this.dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+    // }
+
     private void closeAllConnections()throws Exception {
         this.dataIn.close();
         this.welcomeSocket.close();
@@ -123,67 +145,21 @@ public class ClientHandler {
 
         setNewPort();
 
-                //TODO: Get port from server
-                outToServer.writeBytes(userName + " " + hostName + " " + speed + " " + globalPort + " " + '\n');
-                //Setting stuff up
-                Socket dataSocket = new Socket(connectionSocket.getInetAddress(), globalPort);
-                DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-                File[] temp = folder.listFiles();
-                if(temp == null){
-                dataOutToClient.writeUTF("EOF");
-                }
-                for (int i=0; i < temp.length; ++i) {
-                        dataOutToClient.writeUTF (temp[i].getName() + "" + '\n');  
-                }
-                dataOutToClient.writeUTF("EOF");
-                dataOutToClient.close();
-                dataSocket.close();
-                System.out.println("Data Socket closed");
-    }
-
-    public void sendKeyword(String keyword) throws Exception {
-        setNewPort();
-        outToServer.writeBytes(globalPort + " " + keyword + " " + '\n');
-        dataServerSocket = new ServerSocket(globalPort);
-        dataSocket = dataServerSocket.accept();
-        dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-        
-    }
-
-    public String retrieveFileNames() throws Exception {
-
-        String sentence;
-        sentence = dataIn.readUTF();
-        return sentence;
-
-    }
-
-    public void cleanUp() throws Exception {
-        dataServerSocket.close();
-        dataSocket.close();
-        System.out.println("Data Socket closed");
-    }
-}
-
-    public void sendKeyword(String keyword) throws Exception {
-        setNewPort();
-        outToServer.writeBytes(globalPort + " " + keyword + " " + '\n');
-        dataServerSocket = new ServerSocket(globalPort);
-        dataSocket = dataServerSocket.accept();
-        dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
-        
-    }
-
-    public String retrieveFileNames() throws Exception {
-
-        String sentence;
-        sentence = dataIn.readUTF();
-        return sentence;
-
-    }
-
-    public void cleanUp() throws Exception {
-        dataServerSocket.close();
+        // TODO: Get port from server
+        outToServer.writeBytes(userName + " " + hostName + " " + speed + " " + globalPort + " " + '\n');
+        // Setting stuff up
+        Socket dataSocket = new Socket(connectionSocket.getInetAddress(), globalPort);
+        DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+        File[] temp = folder.listFiles();
+        if (temp == null) {
+            dataOutToClient.writeUTF("EOF");
+        }
+        System.out.println("Here4");
+        for (int i = 0; i < temp.length; ++i) {
+            dataOutToClient.writeUTF(temp[i].getName() + "" + '\n');
+        }
+        dataOutToClient.writeUTF("EOF");
+        dataOutToClient.close();
         dataSocket.close();
         System.out.println("Data Socket closed");
     }

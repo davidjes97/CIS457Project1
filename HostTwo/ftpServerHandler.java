@@ -75,7 +75,6 @@ class ftpServerHandler implements Runnable {
         for (int i = 0; i < temp.length; i ++) {
             if (temp[i].getName().equals(fileName)) 
                 fileSize = temp[i].length();
-            
         }
 
         FileInputStream fis = new FileInputStream(folder + " " + fileName);
