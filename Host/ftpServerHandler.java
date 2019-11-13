@@ -56,39 +56,39 @@ class ftpServerHandler implements Runnable {
         }
     }
 
-    // private void retrieve(String fileName) throws Exception{
-    //     FileInputStream fileToClient = new FileInputStream("./file_folder/" + fileName);
-    //     byte[] fileData = new byte[1024];
-    //     int bytes = 0;
-    //     while ((bytes = fileToClient.read(fileData, 0, fileData.length)) != -1) {
-    //       this.dataOutToClient.write(fileData, 0, bytes);
-    //     }
-    //     fileToClient.close();
-    //     endConnection();
-    // }
-
-    private void retrieve(String fileName)throws Exception {
-        File folder = new File("file_folder/");
-        long fileSize = 0;
-        File[] temp = folder.listFiles();
-        for (int i = 0; i < temp.length; i ++) {
-            if (temp[i].getName().equals(fileName)) 
-                fileSize = temp[i].length();
-            
+    private void retrieve(String fileName) throws Exception{
+        FileInputStream fileToClient = new FileInputStream("./file_folder/" + fileName);
+        byte[] fileData = new byte[1024];
+        int bytes = 0;
+        while ((bytes = fileToClient.read(fileData, 0, fileData.length)) != -1) {
+          this.dataOutToClient.write(fileData, 0, bytes);
         }
-
-        FileInputStream fis = new FileInputStream(folder + " " + fileName);
-        byte[] buffer = new byte[4096];
-        int read;
-        dataOutToClient.writeLong(fileSize);
-        while ((read = fis.read(buffer)) > 0) {
-            dataOutToClient.write(buffer, 0, read);
-        }
-        System.out.println("\nFile  = " + fileName + " Sent.");
-        fis.close();
-
+        fileToClient.close();
         endConnection();
     }
+
+    // private void retrieve(String fileName)throws Exception {
+    //     File folder = new File("file_folder/");
+    //     long fileSize = 0;
+    //     File[] temp = folder.listFiles();
+    //     for (int i = 0; i < temp.length; i ++) {
+    //         if (temp[i].getName().equals(fileName)) 
+    //             fileSize = temp[i].length();
+            
+    //     }
+
+    //     FileInputStream fis = new FileInputStream(folder + " " + fileName);
+    //     byte[] buffer = new byte[4096];
+    //     int read;
+    //     dataOutToClient.writeLong(fileSize);
+    //     while ((read = fis.read(buffer)) > 0) {
+    //         dataOutToClient.write(buffer, 0, read);
+    //     }
+    //     System.out.println("\nFile  = " + fileName + " Sent.");
+    //     fis.close();
+
+    //     endConnection();
+    // }
 
     private void endConnection()throws Exception {
         this.dataOutToClient.close();

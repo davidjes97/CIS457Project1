@@ -4,7 +4,7 @@ public class FileElement{
     public UserElement user;
 
     public FileElement(UserElement user, String fileName, String description){
-        this.user =user;
+        this.user = user;
         this.description = description;
         this.fileName = fileName;
     }
