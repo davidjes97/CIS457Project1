@@ -201,10 +201,6 @@ public class hostGUI extends JFrame implements ActionListener {
 		//Adding boolean binding to keyword search button
 		// searchBut.disablePropert().bind(bb);
 
-        /**Create Table to show list of retirved files with hostname and speed */
-        searchTable = new JTable(fileListArray, colNames);
-        scroll = new JScrollPane(searchTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
         /**Initialize Variables */
         keywordTXT = new JTextField("", 10);
         searchTitle = new JLabel("<html> <font color='blue'>SEARCH</font></html>");
@@ -272,16 +268,19 @@ public class hostGUI extends JFrame implements ActionListener {
 
         if (e.getSource() == connectBut) {
 
-			try
-			{
-				client = new ClientHandler(hostIP, port, userName, hostName, speed);
-				commandArea.append("connected to " + hostIP + " " + port + ".\n");
-				connectBut.setEnabled(false);
-			}
-			catch(Exception E){
-				System.out.println(E);
-				commandArea.append("Problem Connecting or sending files to:" + hostIP + " " + port + ".\n");
-			}
+            hostIP = hostIPTXT.getText();
+            port = Integer.parseInt(portTXT.getText());
+            userName = userNameTXT.getText();
+            hostName = hostNameTXT.getText();
+            speed = (String)speedList.getSelectedItem();
+
+            try {
+                client = new ClientHandler(hostIP, port, userName, hostName, speed);
+                commandArea.append(">> Connect:  " + hostIP + ":" + port + ".\n");
+            } catch (Exception E) {
+                System.out.println(E);
+                commandArea.append("Problem Connecting or sending files to:" + hostIP + " " + port + ".\n");
+            }
 		}
 		else if(e.getSource() == searchBut){
 			if(client == null) {

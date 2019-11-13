@@ -1,6 +1,6 @@
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io. *;
+import java.net. *;
+import java.util. *;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -14,7 +14,7 @@ import org.w3c.dom. *;
 class centralServer {
 
     private static ServerSocket welcomeSocket;
-    public static void main(String argv[]) throws Exception {
+    public static void main(String argv[])throws Exception {
         try {
             welcomeSocket = new ServerSocket(12000);
 
@@ -67,9 +67,11 @@ class ClientServerHandler extends Thread {
         String fromClient;
         String clientCommand;
 
-        try {
-            while (connectionIsLive) {
+        while (connectionIsLive) {
+
+            try{
                 if (initialConnection) {
+                try {
                     String userInfo = this.inFromClient.readLine();
                     try{
                         getInitialRequest(userInfo);
@@ -85,8 +87,7 @@ class ClientServerHandler extends Thread {
                     // processRequest(fromClient);
                     StringTokenizer tokens = new StringTokenizer(fromClient);
                     try{
-                        searchKeyword(tokens.nextToken());
-                    }catch(Exception sKey){
+                        sendFile(tokens.nextToken(), tokens.nextToken());                    }catch(Exception sKey){
                         System.out.println(sKey);
                     }
                         
@@ -94,29 +95,12 @@ class ClientServerHandler extends Thread {
             } catch(IOException ioTotalEx){
                 System.out.println("Error in total connection");
             }
-        } catch (Exception e) {
-            System.out.println(e);
-            File temp = new File(filename);
-            temp.delete();
+            
         }
     }
 
-    private void waitForRequest() throws Exception {
-        System.out.println("Waiting for request");
-        String fromClient = this.inFromClient.readLine();
-        System.out.println("Keyword received");
-        processRequest(fromClient);
-    }
 
-    private void processRequest(String sentence) throws Exception {
-        StringTokenizer tokens = new StringTokenizer(sentence);
-
-        System.out.println("Keyword searched");
-        sendFile(tokens.nextToken(), tokens.nextToken());
-    }
-
-
-    private void getInitialRequest(String userInfo) throws Exception {
+    private void getInitialRequest(String userInfo)throws Exception {
         System.out.println(userInfo);
 
         StringTokenizer parseUserInfo = new StringTokenizer(userInfo);
@@ -134,7 +118,7 @@ class ClientServerHandler extends Thread {
         System.out.println("Initial connection completed with: " + userName);
     }
 
-    private void retrieveFiles(String port) throws Exception {
+    private void retrieveFiles(String port)throws Exception {
 
         ServerSocket dataServerSocket = new ServerSocket(Integer.parseInt(port));
         Socket dataSocket = dataServerSocket.accept();
@@ -154,9 +138,11 @@ class ClientServerHandler extends Thread {
         boolean notEnd = true;
         String modifiedSentence = "";
 
-        String f= "";
-        while(new File("fileList/" + user.getUserName() + f + ".xml").exists())
-        f= f + "z";
+        String f = "";
+        while (new File("fileList/" + user.getUserName() + f + ".xml").exists()) 
+            f = f + "z";
+        
+
         filename = "fileList/" + user.getUserName() + f + ".xml";
 
         while (notEnd) {
@@ -195,12 +181,12 @@ class ClientServerHandler extends Thread {
     private void sendFile(String port, String keyword) {
 
         try {
-        Socket dataSocket = new Socket(connectionSocket.getInetAddress(), Integer.parseInt(port));
-        DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
-        Node nNode;
-        NodeList nList;
-        String hostName;
-        String speed;
+            Socket dataSocket = new Socket(connectionSocket.getInetAddress(), Integer.parseInt(port));
+            DataOutputStream dataOutToClient = new DataOutputStream(dataSocket.getOutputStream());
+            Node nNode;
+            NodeList nList;
+            String hostName;
+            String speed;
             File inputFile;
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -216,26 +202,26 @@ class ClientServerHandler extends Thread {
                 doc = dBuilder.parse(inputFile);
                 doc.getDocumentElement().normalize();
                 nList = doc.getElementsByTagName("file");
-               // dataOutToClient.writeUTF(temp[i].getName() + "" + '\n');
-                for (int num = 0; num < nList.getLength(); num++) {
+                // dataOutToClient.writeUTF(temp[i].getName() + "" + '\n');
+                for (int num = 0; num < nList.getLength(); num ++) {
                     nNode = nList.item(num);
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element eElement = (Element) nNode;
-                        if(eElement.getElementsByTagName("filename").item(0).getTextContent().contains(keyword))
-                            dataOutToClient.writeUTF(eElement.getElementsByTagName("filename").item(0).getTextContent() + " " 
-                            + eElement.getElementsByTagName("hostname").item(0).getTextContent() + " " 
-                            + eElement.getElementsByTagName("speed").item(0).getTextContent() + " " + '\n');
+                        Element eElement = (Element)nNode;
+                        if (eElement.getElementsByTagName("filename").item(0).getTextContent().contains(keyword)) 
+                            dataOutToClient.writeUTF(eElement.getElementsByTagName("filename").item(0).getTextContent() + " " + eElement.getElementsByTagName("hostname").item(0).getTextContent() + " " + eElement.getElementsByTagName("speed").item(0).getTextContent() + " " + '\n');
+                        
+
                     }
                 }
             }
-        dataOutToClient.writeUTF("EOF");
-        dataOutToClient.close();
-        dataSocket.close();
-        System.out.println("Data Socket closed");
-    } catch (IOException ioEx) {
-        ioEx.printStackTrace();
-    } catch (Exception E) {
-        E.printStackTrace();
-    }
+            dataOutToClient.writeUTF("EOF");
+            dataOutToClient.close();
+            dataSocket.close();
+            System.out.println("Data Socket closed");
+        } catch (IOException ioEx) {
+            ioEx.printStackTrace();
+        } catch (Exception E) {
+            E.printStackTrace();
+        }
     }
 }

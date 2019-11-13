@@ -2,8 +2,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util. *;
 import java.awt.EventQueue;
-import javax.swing. *;
-import java.text.*;
+import javax.swing.*;
+import javax.swing.table.*;
 /*****************************************************************
 * Host GUI supports the front end for three user functions:
 * 1. User can connect to centralized server
@@ -187,15 +187,19 @@ public class hostGUI extends JFrame implements ActionListener {
         Panel.add(speedLBL);
         Panel.add(speedList);
 
-        /**FOR THE KEYWORD SEARCH SECTION */
-
-        /**Array to display files from keyword search. */
-        String[] colNames = new String[]{"Speed", "Hostname", "Filename"};
-        String[][] fileListArray = new String[][]{{"Ethernet", "191.12.32.96",  "example.txt"}};
-
-        /**Create Table to show list of retirved files with hostname and speed */
-        searchTable = new JTable(fileListArray, colNames);
-        scroll = new JScrollPane(searchTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		/**Array to display files from keyword search. */
+		/**Create Table to show list of retirved files with hostname and speed */
+		searchTable = new JTable(new DefaultTableModel(new Object[]{"FileName", "Hostname", "Speed"}, 0));
+		scroll = new JScrollPane(searchTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+		/**Initialize Variables */
+		keywordTXT = new JTextField("",10);
+		searchTitle = new JLabel("<html> <font color='blue'>SEARCH</font></html>");
+		keywordLBL = new JLabel("Keyword:");
+		searchBut = new JButton("Search");
+		searchBut.addActionListener(this);
+		//Adding boolean binding to keyword search button
+		// searchBut.disablePropert().bind(bb);
 
         /**Initialize Variables */
         keywordTXT = new JTextField("", 10);
@@ -277,6 +281,55 @@ public class hostGUI extends JFrame implements ActionListener {
                 System.out.println(E);
                 commandArea.append("Problem Connecting or sending files to:" + hostIP + " " + port + ".\n");
             }
+		}
+		else if(e.getSource() == searchBut){
+			if(client == null) {
+				commandArea.append("You need to connect to a server first before you search a keyword.\n");
+			}
+			else if(keywordTXT.getText().isEmpty()){
+				commandArea.append("Please Enter a Keyword.\n");
+			}
+			else{
+			try {
+				DefaultTableModel model = (DefaultTableModel) searchTable.getModel();
+				model.setRowCount(0);			
+				String keyword = keywordTXT.getText();
+				client.sendKeyword(keyword);
+				String temporary;
+			do{
+			temporary = client.retrieveFileNames();
+			if(!temporary.equals("EOF")){
+				StringTokenizer token = new StringTokenizer(temporary);
+
+                model.addRow(new Object[]{token.nextToken(), token.nextToken(), token.nextToken()});
+			}
+			}while(!temporary.equals("EOF"));
+			client.cleanUp();
+			if(model.getRowCount()==0){commandArea.append("No files with that keyword.\n");}
+			}
+			catch (Exception E){
+				System.out.println(E);	
+			}
+			}
+		}
+		else if(e.getSource() == goBut){
+			/** used to get the command the user has entered*/
+			// hostIP = hostIPTXT.getText();
+			// port = Integer.parseInt(portTXT.getText());
+			// userName = userNameTXT.getText();
+			// hostName = hostNameTXT.getText();
+			// speed = (String) speedList.getSelectedItem();
+			//ClientHandler remoteClient = new ClientHandler(hostIP, port, userName, hostName, speed);
+			StringTokenizer tokenizer = new StringTokenizer(commandTXT.getText());
+			String command = tokenizer.nextToken();
+
+            try {
+                client = new ClientHandler(hostIP, port, userName, hostName, speed);
+                commandArea.append(">> Connect:  " + hostIP + ":" + port + ".\n");
+            } catch (Exception E) {
+                System.out.println(E);
+                commandArea.append("Problem Connecting or sending files to:" + hostIP + " " + port + ".\n");
+            }
         } else if (e.getSource() == searchBut) {
             String keyword = keywordTXT.getText();
 
@@ -316,7 +369,7 @@ public class hostGUI extends JFrame implements ActionListener {
 				
                 // call the retr function, look at remote host connected with that file
                 // probably have to iterate through array till specified filename is found
-            } else {
+            }  else {
                 commandArea.append("Invalid command! \nValid commands are: 'connect IP Port' || 'retr filename.txt' || 'quit'\n");
             }
         }
