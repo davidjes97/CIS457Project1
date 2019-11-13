@@ -8,7 +8,7 @@ public class ftpserver implements Runnable {
     private ServerSocket welcomeSocket;
 
     public ftpserver()throws Exception {
-            welcomeSocket = new ServerSocket(41000);
+            welcomeSocket = new ServerSocket(42000);
     }
 
     public void run(){

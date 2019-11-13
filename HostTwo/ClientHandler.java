@@ -42,14 +42,13 @@ public class ClientHandler{
         command = command.toLowerCase();
 
         // initializeConnection(sentence);
-        
-        closeAllConnections();
+      closeAllConnections();
         return message;
     }
 
     //Gets new port
     private int setNewPort(){
-        return globalPort += 20;
+        return globalPort += 2;
     }
 
     //Retrieves a file from a user

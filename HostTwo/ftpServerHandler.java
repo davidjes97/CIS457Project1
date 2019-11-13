@@ -55,7 +55,6 @@ class ftpServerHandler implements Runnable{
         }
     }
 
-
     private void retrieve(String filename) throws Exception {
         File folder = new File("file_folder/");
         long fileSize = 0;

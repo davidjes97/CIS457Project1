@@ -100,7 +100,7 @@ class ClientServerHandler extends Thread {
 
 
     private void getInitialRequest(String userInfo) throws Exception {
-        System.out.println(userInfo);
+
 
         StringTokenizer parseUserInfo = new StringTokenizer(userInfo);
 
@@ -108,6 +108,8 @@ class ClientServerHandler extends Thread {
         String hostName = parseUserInfo.nextToken();
         String speed = parseUserInfo.nextToken();
         String port = parseUserInfo.nextToken();
+
+        System.out.println(hostName + "connected");
 
         user = new UserElement(userName, speed, hostName);
 

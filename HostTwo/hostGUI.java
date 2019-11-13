@@ -5,18 +5,18 @@ import java.awt.EventQueue;
 import javax.swing.*;
 import javax.swing.table.*;
 /*****************************************************************
-* Host GUI supports the front end for three user functions:
-* 1. User can connect to centralized server
-* 2. Search for files based on a keyword search
-* 3. Perform an FTP command to either retrieve a file or disconnect
-* 
-* @author Ryan De Jong
-* @author Jesse David
-* @author Josh Gorodinsky
-* @author Isaac Dessert
-*
-* @version Fall 2019
-******************************************************************/
+ * Host GUI supports the front end for three user functions:
+ * 1. User can connect to centralized server
+ * 2. Search for files based on a keyword search
+ * 3. Perform an FTP command to either retrieve a file or disconnect
+ * 
+ * @author Ryan De Jong
+ * @author Jesse David
+ * @author Josh Gorodinsky
+ * @author Isaac Dessert
+ *
+ * @version Fall 2019
+ ******************************************************************/
 
 public class hostGUI extends JFrame implements ActionListener {
 	/**Displays the functions a user can perform through a graphical user interface*/
@@ -37,11 +37,11 @@ public class hostGUI extends JFrame implements ActionListener {
 	private JLabel portNumberLBL;
 	/**Label for userName textbox*/
 	private JLabel userNameLBL;
-    /**Label for hostName textbox*/
-    private JLabel hostNameLBL;
-    /**Label for speed droplist*/
-    private JLabel speedLBL;
-    /**Used to connect to centralized server*/
+	/**Label for hostName textbox*/
+	private JLabel hostNameLBL;
+	/**Label for speed droplist*/
+	private JLabel speedLBL;
+	/**Used to connect to centralized server*/
 	private JButton connectBut;
 	/**Allows the user to enter desired IP address*/
 	private JTextField hostIPTXT;
@@ -52,8 +52,8 @@ public class hostGUI extends JFrame implements ActionListener {
 	/**text field for user to enter their userName*/
 	private JTextField userNameTXT;
 	/**Creates the JCombobox of speed choices */
-	JComboBox<String> speedList;
-	
+	JComboBox < String > speedList;
+
 	/**FOR THE SEARCH SECTION*/
 
 	/**Label for the keyword searchbox */
@@ -89,35 +89,54 @@ public class hostGUI extends JFrame implements ActionListener {
 	protected ClientHandler client;
 	protected ClientHandler peer;
 
-    
-    /**********************************************
-    * Runs the GUI
-    * @param args Standard declaration for main
-    **********************************************/
-    public static void main(String args[]) {
-		EventQueue.invokeLater(new Runnable(){
-			public void run(){
-				try{
+	/**********************************************
+	 * Runs the GUI
+	 * @param args Standard declaration for main
+	 **********************************************/
+	public static void main(String args[]) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
 					hostGUI hgui = new hostGUI();
 					ftpserver server = new ftpserver();
 					Thread thread = new Thread(server);
 					thread.start();
-				} catch(Exception e){
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-    }
+	}
 
 	/**Initializes each variable*/
 	public hostGUI() {
 		setTitle("GV-NAPSTER Host");
 		getContentPane();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		/**ADDING IN BUTTON BINDING 
+		 * Helped by Uluk Biy on Stack Overflow
+		 * Link: https://stackoverflow.com/questions/23040531/how-to-disable-button-when-textfield-is-empty
+		 */
+		// BooleanBinding bb = new BooleanBinding() {
+		// 	{
+		// 		super.bind(keywordTXT.textProperty());
+		// 	}
+
+		// 	@Override
+		// 	protected boolean computeValue(){
+		// 		return (keywordTXT.getText().isEmpty());
+		// 	}
+		// };
+
+
+		/**FOR THE CONNECTION SECTION */
 
 		/** creates a string of speed options for the combobox */
-		String[] speedListArray = new String[] {"Ethernet", "T1"};
-		speedList = new JComboBox<>(speedListArray);
+		String[] speedListArray = new String[] {
+			"Ethernet",
+			"T1"
+		};
+		speedList = new JComboBox < > (speedListArray);
 
 		Panel = (JPanel) getContentPane();
 		Panel.setLayout(null);
@@ -127,19 +146,19 @@ public class hostGUI extends JFrame implements ActionListener {
 		connectBut.addActionListener(this);
 
 		/**Initializes labels and textboxes*/
-		hostIPTXT = new JTextField("",10);
-		portTXT = new JTextField("",10);
-		hostNameTXT = new JTextField("",20);
-		userNameTXT = new JTextField("",10);
+		hostIPTXT = new JTextField("", 10);
+		portTXT = new JTextField("", 10);
+		hostNameTXT = new JTextField("", 20);
+		userNameTXT = new JTextField("", 10);
 		connectTitle = new JLabel("<html> <font color='blue'>CONNECTION</font></html>");
 		IPNameLBL = new JLabel("Server Hostname:");
 		portNumberLBL = new JLabel("Port:");
-        userNameLBL = new JLabel("Username:");
-        hostNameLBL = new JLabel("Hostname:");
-        speedLBL = new JLabel("Speed:");
+		userNameLBL = new JLabel("Username:");
+		hostNameLBL = new JLabel("Hostname:");
+		speedLBL = new JLabel("Speed:");
 
 		/**Organizes components on the panel*/
-		connectTitle.setBounds(5,5, 100, 26);
+		connectTitle.setBounds(5, 5, 100, 26);
 		/**First Line*/
 		IPNameLBL.setBounds(10, 25, 150, 26);
 		hostIPTXT.setBounds(120, 25, 200, 26);
@@ -154,7 +173,7 @@ public class hostGUI extends JFrame implements ActionListener {
 		hostNameTXT.setBounds(318, 60, 200, 26);
 		speedLBL.setBounds(527, 60, 100, 26);
 		speedList.setBounds(568, 60, 130, 26);
-		
+
 
 		/** adds to the panel */
 		Panel.add(connectTitle);
@@ -174,11 +193,15 @@ public class hostGUI extends JFrame implements ActionListener {
 
 		/**Array to display files from keyword search. */
 		/**Create Table to show list of retirved files with hostname and speed */
-		searchTable = new JTable(new DefaultTableModel(new Object[]{"FileName", "Hostname", "Speed"}, 0));
+		searchTable = new JTable(new DefaultTableModel(new Object[] {
+			"FileName",
+			"Hostname",
+			"Speed"
+		}, 0));
 		scroll = new JScrollPane(searchTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		
+
 		/**Initialize Variables */
-		keywordTXT = new JTextField("",10);
+		keywordTXT = new JTextField("", 10);
 		searchTitle = new JLabel("<html> <font color='blue'>SEARCH</font></html>");
 		keywordLBL = new JLabel("Keyword:");
 		searchBut = new JButton("Search");
@@ -206,14 +229,14 @@ public class hostGUI extends JFrame implements ActionListener {
 		/**FOR THE FTP SECTION */
 
 		/**Initialize variables */
-		commandTXT = new JTextField("",10);
+		commandTXT = new JTextField("", 10);
 		FTPTitle = new JLabel("<html> <font color='blue'>FTP</font></html>");
 		enterCommandLBL = new JLabel("Enter Command:");
 		goBut = new JButton("Go");
 		goBut.addActionListener(this);
 
 		/**create text area for user to see server esponse and entered commands */
-		commandArea = new JTextArea(600,200);
+		commandArea = new JTextArea(600, 200);
 		commandArea.setEditable(false); //user can't edit this text area 
 		commandScroll = new JScrollPane(commandArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
@@ -242,8 +265,8 @@ public class hostGUI extends JFrame implements ActionListener {
 	 ************************************************/
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
-		if(e.getSource() == connectBut) {	
+
+		if (e.getSource() == connectBut) {
 
 			hostIP = hostIPTXT.getText();
 			port = Integer.parseInt(portTXT.getText());
@@ -251,104 +274,82 @@ public class hostGUI extends JFrame implements ActionListener {
 			hostName = hostNameTXT.getText();
 			speed = (String) speedList.getSelectedItem();
 
-			try
-			{
+			try {
 				client = new ClientHandler(hostIP, port, userName, hostName, speed);
 				commandArea.append("connected to " + hostIP + " " + port + ".\n");
 				connectBut.setEnabled(false);
-			}
-			catch(Exception E){
+			} catch (Exception E) {
 				System.out.println(E);
 				commandArea.append("Problem Connecting or sending files to:" + hostIP + " " + port + ".\n");
 			}
-		}
-		else if(e.getSource() == searchBut){
-			if(client == null) {
+		} else if (e.getSource() == searchBut) {
+			if (client == null) {
 				commandArea.append("You need to connect to a server first before you search a keyword.\n");
-			}
-			else if(keywordTXT.getText().isEmpty()){
+			} else if (keywordTXT.getText().isEmpty()) {
 				commandArea.append("Please Enter a Keyword.\n");
-			}
-			else{
-			try {
-				DefaultTableModel model = (DefaultTableModel) searchTable.getModel();
-				model.setRowCount(0);			
-				String keyword = keywordTXT.getText();
-				client.sendKeyword(keyword);
-				String temporary;
-			do{
-			temporary = client.retrieveFileNames();
-			if(!temporary.equals("EOF")){
-				StringTokenizer token = new StringTokenizer(temporary);
+			} else {
+				try {
+					DefaultTableModel model = (DefaultTableModel) searchTable.getModel();
+					model.setRowCount(0);
+					String keyword = keywordTXT.getText();
+					client.sendKeyword(keyword);
+					String temporary;
+					do {
+						temporary = client.retrieveFileNames();
+						if (!temporary.equals("EOF")) {
+							StringTokenizer token = new StringTokenizer(temporary);
 
-                model.addRow(new Object[]{token.nextToken(), token.nextToken(), token.nextToken()});
+							model.addRow(new Object[] {
+								token.nextToken(), token.nextToken(), token.nextToken()
+							});
+						}
+					} while (!temporary.equals("EOF"));
+					client.cleanUp();
+					if (model.getRowCount() == 0) {
+						commandArea.append("No files with that keyword.\n");
+					}
+				} catch (Exception E) {
+					System.out.println(E);
+				}
 			}
-			}while(!temporary.equals("EOF"));
-			client.cleanUp();
-			if(model.getRowCount()==0){commandArea.append("No files with that keyword.\n");}
-			}
-			catch (Exception E){
-				System.out.println(E);	
-			}
-			}
-		}
-		else if(e.getSource() == goBut){
+		} else if (e.getSource() == goBut) {
 			StringTokenizer tokenizer = new StringTokenizer(commandTXT.getText());
 			String command = tokenizer.nextToken();
-
-
-			if(command.equals("quit"))
-			{
-				if(peer.equals(null)){
+			if (command.equals("quit")) {
+				if (peer.equals(null)) {
 					commandArea.append("Nothing to quit:" + ".\n");
-				}
-				else{
-				try{
-				peer.cleanUp(commandTXT.getText());
-				commandArea.append("Successfully closed connection.\n");
-				}
-				catch(Exception E){
-					System.out.println(E);
-					commandArea.append("Problem Closing:" + ".\n");
+				} else {
+					try {
+						peer.cleanUp(commandTXT.getText());
+					} catch (Exception E) {
+						System.out.println(E);
+						commandArea.append("Problem Closing:" + ".\n");
 					}
 				}
-				//call the quit function
-			}
-			else if(command.equals("retr"))	
-			{
-				if(peer.equals(null)){
+
+			} else if (command.equals("retr")) {
+				if (peer.equals(null)) {
 					commandArea.append("Not connected to any other hosts:" + ".\n");
+				} else {
+					String filename = tokenizer.nextToken();
+					try {
+						peer.downloadFile(filename, commandTXT.getText());
+					} catch (Exception E) {
+						System.out.println(E);
+						commandArea.append("Problem retrieving file:" + ".\n");
+					}
 				}
-				else{
-				String filename = tokenizer.nextToken();
-				try
-				{
-				peer.downloadFile(filename,commandTXT.getText());
-			}
-			catch(Exception E){
-			System.out.println(E);
-			commandArea.append("Problem retrieving file:" + ".\n");
-			}
-		}
-				//call the retr function, look at remote host connected with that file
-				//probably have to iterate through array till specified filename is found
-			}
-			else if(command.equals("connect"))
-			{
-				String IPaddress = tokenizer.nextToken();					//IP address to connect with
-				int remotePort = Integer.parseInt(tokenizer.nextToken());	//portnumber user has entered to connect with
-				try
-				{
-				peer = new ClientHandler(IPaddress, remotePort);
-				commandArea.append("Connected to Host." + IPaddress + "\n");
+			} else if (command.equals("connect")) {
+				String IPaddress = tokenizer.nextToken(); //IP address to connect with
+				int remotePort = Integer.parseInt(tokenizer.nextToken()); //portnumber user has entered to connect with
+				try {
+					peer = new ClientHandler(IPaddress, remotePort);
+					commandArea.append("Connected to Host." + IPaddress + "\n");
+				} catch (Exception E) {
+					System.out.println(E);
+					commandArea.append("Problem Connecting to remote Host:" + ".\n");
 				}
-				catch(Exception E){
-				System.out.println(E);
-				commandArea.append("Problem Connecting to remote Host:" + ".\n");
-				}
-			}
-			else
-			{
+			} else {
 				commandArea.append("Invalid command! \nValid commands are: 'connect IP Port' || 'retr filename.txt' || 'quit'\n");
 			}
 		}
