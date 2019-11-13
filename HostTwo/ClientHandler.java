@@ -18,7 +18,7 @@ public class ClientHandler {
     private int numOfOps;
     private int globalPort;
     private int startingPort = 12000;
-    private int initialDataPort = 2327;
+    private int initialDataPort = 2328;
     private String fileServerName;
     final File folder = new File("file_folder/");
 
@@ -31,7 +31,6 @@ public class ClientHandler {
     }
 
     public String runCommand(String sentence) throws Exception {
-        setNewPort();
         String message = "";
         StringTokenizer token = new StringTokenizer(sentence);
         String command = token.nextToken();
@@ -59,47 +58,32 @@ public class ClientHandler {
         return globalPort += 2;
     }
 
-    // private void retrieveFile(String fileName) throws Exception {
-    //     FileOutputStream retrievedFile = new FileOutputStream("./file_folder/" + fileName);
-    //     byte[] fileData = new byte[1024];
-    //     int bytes = 0;
-    //     while ((bytes = dataIn.read(fileData)) != -1) {
-    //       retrievedFile.write(fileData, 0, bytes);
-    //     }
-    //     retrievedFile.close();
-    // }
-
     // Retrieves a file from a user
     private void retrieveFile(String fileName)throws Exception {
         int port = setNewPort();
         System.out.println("Woah someone is trying to get" + fileName);
-        outToServer.writeBytes(port + " " + "retr:" + " " + fileName + " " + '\n');
 
-        ServerSocket fileWelcomeSocket = new ServerSocket(port);
-        Socket fileDataSocket = fileWelcomeSocket.accept();
-        DataInputStream inData = new DataInputStream(new BufferedInputStream(fileDataSocket.getInputStream()));
         int read = 0;
         byte[] buffer = new byte[4096];
 
-        FileOutputStream fos = new FileOutputStream(fileName);
-        long fileSize = inData.readLong();
+        FileOutputStream fos = new FileOutputStream("./file_folder/" + fileName);
+        long fileSize = dataIn.readLong();
         long remaining = fileSize;
 
         System.out.println("Downloading File.....");
 
-        while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int)remaining))) > 0) {
+        while ((read = dataIn.read(buffer, 0, Math.min(buffer.length, (int)remaining))) > 0) {
             remaining -= (long)read;
             fos.write(buffer, 0, read);
         }
         System.out.println("\nFile Successfully downloaded.");
-        fileWelcomeSocket.close();
-        inData.close();
-        fileDataSocket.close();
+        fos.close();
     }
 
     private void connect(String sentence) throws Exception {
 
         System.out.println("Gonna try to connect to the other host?");
+        System.out.println("This is my sentence in connect " + sentence);
 
         int connectionPort = setNewPort();
     

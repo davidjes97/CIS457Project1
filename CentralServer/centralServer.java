@@ -93,6 +93,8 @@ class ClientServerHandler extends Thread {
                         
                 }
             } catch(IOException ioTotalEx){
+                File temp = new File(filename);
+                temp.delete();
                 System.out.println("Error in total connection");
             }
             
@@ -132,6 +134,7 @@ class ClientServerHandler extends Thread {
         Element attrType;
         Element attrType1;
         Element attrType2;
+        
         doc.appendChild(hierarchy);
 
         DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
