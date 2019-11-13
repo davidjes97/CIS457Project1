@@ -9,7 +9,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.*;
+import org.w3c.dom. *;
 
 class centralServer {
 
@@ -66,22 +66,45 @@ class ClientServerHandler extends Thread {
     public void run() {
         String fromClient;
         String clientCommand;
-        int port;
 
         try {
             while (connectionIsLive) {
                 if (initialConnection) {
                     String userInfo = this.inFromClient.readLine();
-                    getInitialRequest(userInfo);
-                } else {
-                    waitForRequest();
+                    try{
+                        getInitialRequest(userInfo);
+                    }catch(Exception initReq){
+                        System.out.println(initReq);
+                    }      
+                } catch (IOException ioEx) {
+                    System.out.println("Error in connection");
                 }
+                } else {
+                    // waitForRequest();
+                    fromClient = this.inFromClient.readLine();
+                    // processRequest(fromClient);
+                    StringTokenizer tokens = new StringTokenizer(fromClient);
+                    try{
+                        searchKeyword(tokens.nextToken());
+                    }catch(Exception sKey){
+                        System.out.println(sKey);
+                    }
+                        
+                }
+            } catch(IOException ioTotalEx){
+                System.out.println("Error in total connection");
             }
         } catch (Exception e) {
             System.out.println(e);
             File temp = new File(filename);
             temp.delete();
         }
+        //     try {
+        // } catch (Exception e) {
+        //     System.out.println(e);
+        //     File temp = new File("fileList/" + user.getUserName() + ".xml");
+        //     temp.delete();
+        // }
     }
 
     private void waitForRequest() throws Exception {

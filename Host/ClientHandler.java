@@ -1,8 +1,8 @@
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io. *;
+import java.net. *;
+import java.util. *;
 
-public class ClientHandler{
+public class ClientHandler {
 
     private int controlPort;
 
@@ -10,6 +10,7 @@ public class ClientHandler{
     private ServerSocket dataServerSocket;
     private Socket dataSocket;
     private Socket connectionSocket;
+    private Socket fileWelcomeSocket;
 
     private DataInputStream dataIn;
     private DataOutputStream outToServer;
@@ -17,9 +18,11 @@ public class ClientHandler{
     private int numOfOps;
     private int globalPort;
     private int startingPort = 12000;
+    private int initialDataPort = 2328;
+    private String fileServerName;
     final File folder = new File("file_folder/");
 
-    public ClientHandler(String serverName, int controlPort, String userName, String hostName, String speed) throws Exception {
+    public ClientHandler(String serverName, int controlPort, String userName, String hostName, String speed)throws Exception {
         globalPort = startingPort;
         this.controlPort = controlPort;
         this.connectionSocket = new Socket(serverName, controlPort);
@@ -33,47 +36,115 @@ public class ClientHandler{
         String command = token.nextToken();
         command = command.toLowerCase();
 
-        // initializeConnection(sentence);
-        
-
-        if(command.equals("retr:")){
+        if (command.equals("connect:")){
+            connect(command);
+            message = "Connected to " + token;
+        }
+        else if (command.equals("retr:")) {
             String fileName = token.nextToken();
             retrieveFile(fileName);
             message = "Succesfully downloaded \"" + fileName + "\".";
-        } else if (command.equals("quit:")){
-            message= "Disconnected from server.";
+        } else if (command.equals("quit")) {
+            message = "Disconnected from server.";
+            closeAllConnections();
         }
         closeAllConnections();
+
         return message;
     }
 
-    //Gets new port
-    private int setNewPort(){
+    // Gets new port
+    private int setNewPort() {
         return globalPort += 2;
     }
 
-    //Retrieves a file from a user
-    private void retrieveFile(String fileName) throws Exception{
-        FileOutputStream retrievedFile = new FileOutputStream(folder + fileName);
+    private void retrieveFile(String fileName) throws Exception {
+        FileOutputStream retrievedFile = new FileOutputStream("./file_folder/" + fileName);
         byte[] fileData = new byte[1024];
         int bytes = 0;
-
-        while((bytes = dataIn.read(fileData)) != -1){
-            retrievedFile.write(fileData, 0 ,bytes);
+        while ((bytes = dataIn.read(fileData)) != -1) {
+          retrievedFile.write(fileData, 0, bytes);
         }
         retrievedFile.close();
     }
 
-    private void closeAllConnections() throws Exception{
+    // Retrieves a file from a user
+    // private void retrieveFile(String fileName)throws Exception {
+    //     int port = setNewPort();
+    //     System.out.println("Woah someone is trying to get" + fileName);
+    //     outToServer.writeBytes(port + " " + "retr:" + " " + fileName + " " + '\n');
+
+    //     ServerSocket fileWelcomeSocket = new ServerSocket(port);
+    //     Socket fileDataSocket = fileWelcomeSocket.accept();
+    //     DataInputStream inData = new DataInputStream(new BufferedInputStream(fileDataSocket.getInputStream()));
+    //     int read = 0;
+    //     byte[] buffer = new byte[4096];
+
+    //     FileOutputStream fos = new FileOutputStream(fileName);
+    //     long fileSize = inData.readLong();
+    //     long remaining = fileSize;
+
+    //     System.out.println("Downloading File.....");
+
+    //     while ((read = inData.read(buffer, 0, Math.min(buffer.length, (int)remaining))) > 0) {
+    //         remaining -= (long)read;
+    //         fos.write(buffer, 0, read);
+    //     }
+    //     System.out.println("\nFile Successfully downloaded.");
+    //     fileWelcomeSocket.close();
+    //     inData.close();
+    //     fileDataSocket.close();
+    // }
+
+    private void connect(String sentence) throws Exception {
+
+        int connectionPort = setNewPort();
+    
+        this.welcomeSocket = new ServerSocket(connectionPort);
+
+        outToServer.writeBytes(connectionPort + " " + sentence);
+    
+        this.dataSocket = this.welcomeSocket.accept();
+    
+        this.dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+    
+    }
+
+    // private void connect(String sentence) {
+    //     StringTokenizer tokens = new StringTokenizer(sentence);
+
+    //     fileServerName = tokens.nextToken();
+    //     fileServerName = tokens.nextToken();
+    //     initialDataPort = Integer.parseInt(tokens.nextToken());
+        
+    //     try{
+    //         fileWelcomeSocket = new Socket(fileServerName, initialDataPort);
+    //     }catch(Exception welcomeException){
+    //         System.out.println(welcomeException);
+    //     }
+    // }
+
+    // private void initializeConnection(String sentence) throws Exception{
+
+
+    //     this.welcomeSocket = new ServerSocket(getNewPort());
+
+    //     outToServer.writeBytes(this.getNewPort() + " " + sentence + " " + '\n');
+
+    //     this.dataSocket = this.welcomeSocket.accept();
+    //     this.dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+    // }
+
+    private void closeAllConnections()throws Exception {
         this.dataIn.close();
         this.welcomeSocket.close();
         this.dataSocket.close();
-        this.numOfOps++;
+        this.numOfOps ++;
     }
 
-    private void sendList(String userName, String hostName, String speed) throws Exception {
+    private void sendList(String userName, String hostName, String speed)throws Exception {
 
-                setNewPort();
+        setNewPort();
 
                 //TODO: Get port from server
                 outToServer.writeBytes(userName + " " + hostName + " " + speed + " " + globalPort + " " + '\n');
@@ -117,3 +188,26 @@ public class ClientHandler{
     }
 }
 
+    public void sendKeyword(String keyword) throws Exception {
+        setNewPort();
+        outToServer.writeBytes(globalPort + " " + keyword + " " + '\n');
+        dataServerSocket = new ServerSocket(globalPort);
+        dataSocket = dataServerSocket.accept();
+        dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+        
+    }
+
+    public String retrieveFileNames() throws Exception {
+
+        String sentence;
+        sentence = dataIn.readUTF();
+        return sentence;
+
+    }
+
+    public void cleanUp() throws Exception {
+        dataServerSocket.close();
+        dataSocket.close();
+        System.out.println("Data Socket closed");
+    }
+}
