@@ -324,6 +324,7 @@ public class hostGUI extends JFrame implements ActionListener {
 				try
 				{
 				peer.downloadFile(filename,commandTXT.getText());
+				commandArea.append("Successfully retrieved file: " + filename + "\n");
 			}
 			catch(Exception E){
 			System.out.println(E);

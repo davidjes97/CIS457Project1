@@ -127,7 +127,7 @@ public class ClientHandler{
         outToServer.writeBytes(secondaryPort + " " + sentence + " " + '\n');
         tempFilename = "./file_folder/" + tempFilename;
                     dataServerSocket = new ServerSocket(secondaryPort);
-                    dataSocket = dataServerSocket.accept();System.out.println("here1");
+                    dataSocket = dataServerSocket.accept();
                     DataInputStream inData = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
                     int read = 0;
                     byte[] buffer = new byte[4096];
