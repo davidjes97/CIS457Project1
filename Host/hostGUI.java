@@ -272,7 +272,7 @@ public class hostGUI extends JFrame implements ActionListener {
 
             try {
                 client = new ClientHandler(hostIP, port, userName, hostName, speed);
-                commandArea.append("connected to " + hostIP + " " + port + ".\n");
+                commandArea.append(">> Connect:  " + hostIP + ":" + port + ".\n");
             } catch (Exception E) {
                 System.out.println(E);
                 commandArea.append("Problem Connecting or sending files to:" + hostIP + " " + port + ".\n");
@@ -298,7 +298,7 @@ public class hostGUI extends JFrame implements ActionListener {
             if (command.equals("quit")) {
 				try{
 					System.out.println("You made it to quit in the gui");
-					client.runCommand(command);
+					System.out.println(client.runCommand(command));
 					dispose();
 				}catch(Exception qE){
 					commandArea.append("Exception found: " + qE);
@@ -309,23 +309,14 @@ public class hostGUI extends JFrame implements ActionListener {
 				String filename = tokenizer.nextToken();
 				try{
 					System.out.println("You made it to retr in the gui");
-					client.runCommand(commandTXT.getText());
+					System.out.println(client.runCommand(commandTXT.getText()));
 				}catch(Exception rE){
 					commandArea.append("Exception found: " + rE);
 				}
 				
                 // call the retr function, look at remote host connected with that file
                 // probably have to iterate through array till specified filename is found
-            } else if (command.equals("connect:")) {
-                try{
-                    client.runCommand(command);
-                }catch(Exception cE){
-                    commandArea.append("Exception found: " + cE);
-                }
-                
-                String IPaddress = tokenizer.nextToken(); // IP address to connect with
-                int remotePort = Integer.parseInt(tokenizer.nextToken()); // portnumber user has entered to connect with
-            } else {
+            }  else {
                 commandArea.append("Invalid command! \nValid commands are: 'connect IP Port' || 'retr filename.txt' || 'quit'\n");
             }
         }

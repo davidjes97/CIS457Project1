@@ -34,12 +34,11 @@ public class ClientHandler {
         StringTokenizer token = new StringTokenizer(sentence);
         String command = token.nextToken();
         command = command.toLowerCase();
+        System.out.println("In the run command with command: " + command);
 
-        if (command.equals("connect:")){
-            connect(command);
-            message = "Connected to " + token;
-        }
-        else if (command.equals("retr:")) {
+        connect(sentence);
+
+        if (command.equals("retr:")) {
             String fileName = token.nextToken();
             retrieveFile(fileName);
             message = "Succesfully downloaded \"" + fileName + "\".";
@@ -96,12 +95,13 @@ public class ClientHandler {
     }
 
     private void connect(String sentence) throws Exception {
+        System.out.println("Gonna try to connect to the other host?");
 
         int connectionPort = setNewPort();
     
         this.welcomeSocket = new ServerSocket(connectionPort);
 
-        outToServer.writeBytes(connectionPort + " " + sentence);
+        outToServer.writeBytes(connectionPort + " " + sentence + "\n");
     
         this.dataSocket = this.welcomeSocket.accept();
     

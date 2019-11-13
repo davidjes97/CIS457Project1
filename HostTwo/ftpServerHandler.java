@@ -68,6 +68,7 @@ class ftpServerHandler implements Runnable {
     // }
 
     private void retrieve(String fileName)throws Exception {
+        System.out.println("Might be sending a file");
         File folder = new File("file_folder/");
         long fileSize = 0;
         File[] temp = folder.listFiles();
