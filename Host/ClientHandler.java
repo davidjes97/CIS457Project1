@@ -187,3 +187,27 @@ public class ClientHandler {
         System.out.println("Data Socket closed");
     }
 }
+
+    public void sendKeyword(String keyword) throws Exception {
+        setNewPort();
+        outToServer.writeBytes(globalPort + " " + keyword + " " + '\n');
+        dataServerSocket = new ServerSocket(globalPort);
+        dataSocket = dataServerSocket.accept();
+        dataIn = new DataInputStream(new BufferedInputStream(dataSocket.getInputStream()));
+        
+    }
+
+    public String retrieveFileNames() throws Exception {
+
+        String sentence;
+        sentence = dataIn.readUTF();
+        return sentence;
+
+    }
+
+    public void cleanUp() throws Exception {
+        dataServerSocket.close();
+        dataSocket.close();
+        System.out.println("Data Socket closed");
+    }
+}
