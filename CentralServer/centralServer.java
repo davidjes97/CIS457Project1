@@ -47,6 +47,8 @@ class ClientServerHandler extends Thread {
     private BufferedReader inFromClient;
     private UserElement user;
 
+    private int port;
+
     protected static Vector<UserElement> userList = new Vector<UserElement>();
     protected static Vector<FileElement> fileList = new Vector<FileElement>();
 
@@ -69,37 +71,60 @@ class ClientServerHandler extends Thread {
     public void run() {
         String fromClient;
         String clientCommand;
-        int port;
 
-        try {
-            while (connectionIsLive) {
+
+        while (connectionIsLive) {
+
+            try{
                 if (initialConnection) {
+                try {
                     String userInfo = this.inFromClient.readLine();
-                    getInitialRequest(userInfo);
-                } else {
-                    waitForRequest();
+                    try{
+                        getInitialRequest(userInfo);
+                    }catch(Exception initReq){
+                        System.out.println(initReq);
+                    }      
+                } catch (IOException ioEx) {
+                    System.out.println("Error in connection");
                 }
+                } else {
+                    // waitForRequest();
+                    fromClient = this.inFromClient.readLine();
+                    // processRequest(fromClient);
+                    StringTokenizer tokens = new StringTokenizer(fromClient);
+                    try{
+                        searchKeyword(tokens.nextToken());
+                    }catch(Exception sKey){
+                        System.out.println(sKey);
+                    }
+                        
+                }
+            } catch(IOException ioTotalEx){
+                System.out.println("Error in total connection");
             }
-        } catch (Exception e) {
-            System.out.println(e);
-            File temp = new File("fileList/" + user.getUserName() + ".xml");
-            temp.delete();
+            
         }
+        //     try {
+        // } catch (Exception e) {
+        //     System.out.println(e);
+        //     File temp = new File("fileList/" + user.getUserName() + ".xml");
+        //     temp.delete();
+        // }
     }
 
-    private void waitForRequest()throws Exception {
-        System.out.println("Waiting for request");
-        String fromClient = this.inFromClient.readLine();
-        System.out.println("Keyword received");
-        processRequest(fromClient);
-    }
+    // private void waitForRequest()throws Exception {
+    //     System.out.println("Waiting for request");
+    //     String fromClient = this.inFromClient.readLine();
+    //     System.out.println("Keyword received");
+    //     processRequest(fromClient);
+    // }
 
-    private void processRequest(String sentence)throws Exception {
-        StringTokenizer tokens = new StringTokenizer(sentence);
+    // private void processRequest(String sentence)throws Exception {
+    //     StringTokenizer tokens = new StringTokenizer(sentence);
 
-        System.out.println("Keyword searched");
-        searchKeyword(tokens.nextToken());
-    }
+    //     System.out.println("Keyword searched");
+    //     searchKeyword(tokens.nextToken());
+    // }
 
     private void searchKeyword(String keyword)throws Exception {
         synchronized(fileList) {
@@ -120,7 +145,7 @@ class ClientServerHandler extends Thread {
         }
     }
 
-    private void getInitialRequest(String userInfo)throws Exception {
+    private void getInitialRequest(String userInfo) {
         System.out.println(userInfo);
 
         StringTokenizer parseUserInfo = new StringTokenizer(userInfo);
@@ -132,21 +157,12 @@ class ClientServerHandler extends Thread {
 
         user = new UserElement(userName, speed, hostName);
 
-        retrieveFiles(port);
-
-
-        // addUser(user);
-
-
-        // this.dataFromClient = new DataInputStream(new BufferedInputStream(this.dataSocket.getInputStream()));
-
-        // File file = getFile();
-        // ArrayList<FileElement> files = parseData(file, user);
-        // addContent(files);
-        // this.initialConnection = false;
-        // System.out.println("Initial connection completed");
-        // this.dataFromClient.close();
-        // this.dataSocket.close();
+        try{
+            retrieveFiles(String.valueOf(port));
+        }catch(Exception rFE){
+            System.out.println(rFE);
+        }
+        
     }
 
     private File getFile()throws Exception {
